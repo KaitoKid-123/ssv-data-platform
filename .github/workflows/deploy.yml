@@ -1,0 +1,46 @@
+name: Deploy wheel to Fabric
+
+# Wheel-only CD (notebooks/models are developed directly on Fabric — see README).
+# Trigger: manual button, or pushing a version tag (v0.1.5, ...).
+on:
+  workflow_dispatch:
+    inputs:
+      verify:
+        description: "Run post-deploy verification (pipeline run + baseline diff, ~20 min)"
+        type: boolean
+        default: false
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: deploy-fabric
+  cancel-in-progress: false   # never kill a publish mid-flight
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: fabric        # optional: add reviewers on this env for manual approval
+    env:
+      FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+      FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+      FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+
+      - name: Install + test (gate before any deploy)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[test]" build requests
+          python -m pytest -q
+
+      - name: Build + deploy wheel to Custom_Env (staging -> publish)
+        run: python tools/deploy_wheel.py
+
+      - name: Post-deploy verification (idempotent day + baseline diff)
+        if: ${{ inputs.verify }}
+        run: python tools/verify_run.py 2025-11-29

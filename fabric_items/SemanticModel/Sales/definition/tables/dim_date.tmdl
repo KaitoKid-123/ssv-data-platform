@@ -1,0 +1,102 @@
+table dim_date
+	lineageTag: 535a7bf3-1f4d-4b48-8fd0-175ac349721a
+	sourceLineageTag: [gold].[dim_date]
+	dataCategory: Time
+
+	column date
+		dataType: dateTime
+		isKey
+		formatString: General Date
+		lineageTag: 5363095e-41b3-4ea9-a4f3-60dbb49df1a7
+		sourceLineageTag: date
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 216627ac-fba3-4529-bc73-572652f04118
+		sourceLineageTag: year
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_key
+		dataType: string
+		lineageTag: ae945774-aea2-4961-b116-80670db6ac31
+		sourceLineageTag: month_key
+		summarizeBy: none
+		sourceColumn: month_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: string
+		lineageTag: ac2fcb62-774d-4e2c-9cd8-0d8fdce0367b
+		sourceLineageTag: month
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 446b363e-f0a1-4493-8522-bc5cfffe9825
+		sourceLineageTag: week_start
+		summarizeBy: none
+		sourceColumn: week_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 8427566a-5467-492d-b177-5f014ee44785
+		sourceLineageTag: day_name
+		summarizeBy: none
+		sourceColumn: day_name
+		sortByColumn: weekday_no
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column weekday_no
+		dataType: int64
+		formatString: 0
+		lineageTag: ec1c3e1f-a225-4184-b5db-8142c53b6f49
+		sourceLineageTag: weekday_no
+		summarizeBy: none
+		sourceColumn: weekday_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 16c962a4-1fc7-4ce8-925e-51de096f4964
+		sourceLineageTag: is_weekend
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_type
+		dataType: string
+		lineageTag: 164b75d1-a684-45f2-a89c-1605e826af54
+		sourceLineageTag: day_type
+		summarizeBy: none
+		sourceColumn: day_type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
+

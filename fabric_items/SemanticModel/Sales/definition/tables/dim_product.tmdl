@@ -1,0 +1,84 @@
+table dim_product
+	lineageTag: 39b7be15-2434-4dda-9072-cccb3a195174
+	sourceLineageTag: [gold].[bi_dim_product]
+
+	column product_id
+		dataType: string
+		isKey
+		lineageTag: 943be5af-05ca-4b3c-936d-e4d38342b9b6
+		sourceLineageTag: product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 99534901-61fe-4c3b-9f5b-8b4f43fcfe61
+		sourceLineageTag: product_name
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_category
+		dataType: string
+		lineageTag: c54d7f1d-2d2e-4767-b8bf-815e95e12008
+		sourceLineageTag: product_category
+		summarizeBy: none
+		sourceColumn: product_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_group
+		dataType: string
+		lineageTag: 17cd4cd3-d1e6-49c0-8962-6e145183860a
+		sourceLineageTag: product_group
+		summarizeBy: none
+		sourceColumn: product_group
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_sub_category
+		dataType: string
+		lineageTag: 9fc96baa-2253-43a4-95c8-7e2b86f10031
+		sourceLineageTag: product_sub_category
+		summarizeBy: none
+		sourceColumn: product_sub_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column retail_business_type
+		dataType: string
+		lineageTag: 68b8abcc-22d9-451c-819d-29bfe9c6dc87
+		sourceLineageTag: retail_business_type
+		summarizeBy: none
+		sourceColumn: retail_business_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column brand
+		dataType: string
+		lineageTag: f28743d3-15b8-4c33-9353-174441cac77b
+		sourceLineageTag: brand
+		summarizeBy: none
+		sourceColumn: brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column manufacturer
+		dataType: string
+		lineageTag: 4843b32e-bc4b-43c7-90b7-510d8cb73f5e
+		sourceLineageTag: manufacturer
+		summarizeBy: none
+		sourceColumn: manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_product = entity
+		mode: directLake
+		source
+			entityName: bi_dim_product
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
+

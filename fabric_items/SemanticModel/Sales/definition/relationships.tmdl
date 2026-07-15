@@ -1,0 +1,12 @@
+relationship 412a036c-7e2c-6ce6-ff89-0ed3da7e72da
+	fromColumn: Sales.report_date
+	toColumn: dim_date.date
+
+relationship f02a18e0-2a80-4ab3-9127-87743ada950e
+	fromColumn: Sales.product_id
+	toColumn: dim_product.product_id
+
+relationship a4810dc3-b7fb-4b80-8b67-5fb4de009695
+	fromColumn: 'Sales Daily'.report_date
+	toColumn: dim_date.date
+

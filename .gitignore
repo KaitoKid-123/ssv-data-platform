@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+.env/
+
+# Build artifacts
+build/
+dist/
+*.whl
+
+# Local Spark (created by pytest / local runs — never commit)
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Generated seed artifacts (regenerate via simulators.write_all_artifacts)
+# NOTE: tests/ and sample_service/ are REAL SOURCE (pytest suite, DLM mock) — never ignore them.
+mongo_import/
+sample_source/
+*.seed.sql
+
+# Local agent/session config
+.claude/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

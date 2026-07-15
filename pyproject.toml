@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ssv-data"
+version = "0.1.4"
+description = "Shared data-platform library for SSV Fabric medallion pipelines"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+]
+# NOTE: pyspark + delta are provided by the Fabric Spark runtime.
+# Do NOT add them as runtime deps — only the test extra pulls pyspark for local runs.
+
+[project.optional-dependencies]
+test = ["pytest>=7", "pyspark>=3.4", "chispa>=0.9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ssv_data"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,393 @@
+table Sales
+	lineageTag: eea560d9-2eb1-46f9-a9b5-1b950d5f2903
+	sourceLineageTag: [gold].[bi_eod_sales]
+
+	measure Revenue = SUM ( Sales[revenue_net] )
+		formatString: 0
+		lineageTag: f33d2994-848a-4b3f-a541-51e93ae080cb
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+		changedProperty = FormatStringDefinition
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Baskets = DISTINCTCOUNT ( Sales[transaction_id] )
+		formatString: 0
+		lineageTag: 51545e12-93cf-4a6e-b663-e5351feb928f
+
+		changedProperty = Name
+
+	measure Units = SUM ( Sales[quantity] )
+		formatString: 0
+		lineageTag: 131de74d-f331-40a0-be06-78fc3e15f155
+
+		changedProperty = Name
+
+	measure Store-Days = COUNTROWS ( SUMMARIZE ( Sales, Sales[report_date], Sales[store_id] ) )
+		formatString: 0
+		lineageTag: 63782624-74e6-4ee3-8e46-4da3733351bd
+
+		changedProperty = Name
+
+	measure 'Basket Size' = DIVIDE ( [Revenue], [Baskets] )
+		lineageTag: b0e44e9a-859c-4d20-92e2-77be76f455b9
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure APSD = DIVIDE ( [Revenue], [Store-Days] )
+		lineageTag: ef49928c-b6b7-4e10-8ef5-4a6af4e3ee91
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Units per Basket' = DIVIDE ( [Units], [Baskets] )
+		lineageTag: 980db79a-e3bc-44fb-8ce1-d9f26fce482d
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Customer Penetration %' = ```
+			
+			    DIVIDE ( CALCULATE ( [Baskets], Sales[is_identified_customer] = 1 ), [Baskets] )
+			```
+		lineageTag: 61ed69d7-9c7d-4298-a5a6-d7ffbbdf4ab2
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Channel Share %' = ```
+			
+			    DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( Sales[channel] ) ) )
+			```
+		lineageTag: c80aae3c-945c-438b-91ca-5cd9ab8fe6ef
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue LW' = CALCULATE ( [Revenue], DATEADD ( dim_date[date], -7, DAY ) )
+		lineageTag: 86ba94ec-54d3-4443-b597-70c088bdfba0
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue WoW %' = DIVIDE ( [Revenue] - [Revenue LW], [Revenue LW] )
+		lineageTag: dc2e25d1-e9b2-4b5b-b3bc-13c2ef6d1498
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue 7D Avg/Day' = ```
+			
+			    DIVIDE ( CALCULATE ( [Revenue], DATESINPERIOD ( dim_date[date], MAX ( dim_date[date] ), -7, DAY ) ), 7 )
+			```
+		lineageTag: 2fae4b22-1eab-4bdc-873b-adddb9538c51
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue MoM %' = ```
+			
+			    VAR PM = CALCULATE ( [Revenue], DATEADD ( dim_date[date], -1, MONTH ) )
+			    RETURN DIVIDE ( [Revenue] - PM, PM )
+			```
+		lineageTag: 165b31f4-e9da-47ff-83d4-7a01d028c6c1
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total COGS' = SUM ( Sales[cogs] )
+		formatString: #,0
+		lineageTag: 24352018-5c76-44b8-bff2-c268178ca83a
+
+	measure 'Gross Margin' = [Revenue] - [Total COGS]
+		formatString: #,0
+		lineageTag: d833a7fa-3b2e-48bd-aef2-98f42a33bb77
+
+	measure 'Margin %' = DIVIDE ( [Gross Margin], [Revenue] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: de3fd709-5e57-46f7-964b-553fce7f946b
+
+	measure 'Unique Customers' = CALCULATE ( DISTINCTCOUNT ( Sales[customer_id] ), Sales[customer_id] > 0 )
+		formatString: 0
+		lineageTag: 43322243-48b6-406a-846d-aa48119b8f5d
+
+	measure 'Identified Baskets' = CALCULATE ( [Baskets], Sales[is_identified_customer] = 1 )
+		formatString: 0
+		lineageTag: 4e9b03c4-66ec-44cc-8151-82b5c8ea7781
+
+	measure 'Identified Rate %' = DIVIDE ( [Identified Baskets], [Baskets] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: c5d0e713-e3ad-430f-99d5-6f8b8afa4c0c
+
+	measure 'Repeat Customers' = COUNTROWS ( FILTER ( VALUES ( Sales[customer_id] ), Sales[customer_id] > 0 && CALCULATE ( DISTINCTCOUNT ( Sales[transaction_id] ) ) >= 2 ) )
+		formatString: 0
+		lineageTag: 2750a0a4-efc2-4968-ba17-b005cbca52ee
+
+	measure 'Repeat Rate %' = DIVIDE ( [Repeat Customers], [Unique Customers] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 6439bed1-046c-4ef1-bced-daf99b2ae29a
+
+	measure 'Avg Rating' = AVERAGE ( Sales[rating] )
+		formatString: 0.00
+		lineageTag: d8594c81-0ab5-496e-92ed-f3c056dbcbe2
+
+	column report_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a1f5a73b-6e68-4e48-bf93-9557b2d4825b
+		sourceLineageTag: report_date
+		summarizeBy: none
+		sourceColumn: report_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: d7e58868-455c-4845-b952-383201366f2e
+		sourceLineageTag: year
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_key
+		dataType: string
+		lineageTag: f8d718f5-55dc-4381-8a01-29f8ab76ef34
+		sourceLineageTag: month_key
+		summarizeBy: none
+		sourceColumn: month_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3725f239-d83c-4cfb-bbd8-43b2f5c96c28
+		sourceLineageTag: week_start
+		summarizeBy: none
+		sourceColumn: week_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 34e756fb-02c3-4ca5-92be-fe2d515e2127
+		sourceLineageTag: day_name
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: int64
+		formatString: 0
+		lineageTag: 442067c9-f432-46d9-a378-2e64119f725c
+		sourceLineageTag: is_weekend
+		summarizeBy: sum
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column txn_hour
+		dataType: int64
+		formatString: 0
+		lineageTag: 42fad14e-0157-4d55-8002-9ed629d6270f
+		sourceLineageTag: txn_hour
+		summarizeBy: sum
+		sourceColumn: txn_hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column daypart
+		dataType: string
+		lineageTag: f9dc4ca8-47c3-4046-a913-e3ab23603fb9
+		sourceLineageTag: daypart
+		summarizeBy: none
+		sourceColumn: daypart
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 344e94a1-134a-466e-b1af-4ee2d4b1b3ce
+		sourceLineageTag: channel
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: string
+		lineageTag: 0761d181-5fb8-4029-b42a-f4044c88288f
+		sourceLineageTag: store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_name
+		dataType: string
+		lineageTag: 4db2f56b-29a4-4b04-bf8c-49dd2b2b40c3
+		sourceLineageTag: store_name
+		summarizeBy: none
+		sourceColumn: store_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_type
+		dataType: string
+		lineageTag: 56b8fd17-a039-4b40-aead-e95c382a4045
+		sourceLineageTag: store_type
+		summarizeBy: none
+		sourceColumn: store_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_id
+		dataType: string
+		lineageTag: 79800a4a-0f12-4764-b1d5-86b9c008ae87
+		sourceLineageTag: transaction_id
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 365cd310-ade2-47ca-8fec-914ae0a25fa7
+		sourceLineageTag: product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 7c12aeb3-4f2f-4424-9334-e903358fcc2f
+		sourceLineageTag: quantity
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue_net
+		dataType: double
+		lineageTag: 7ff9d217-a6a9-49bc-a9cd-65941e03429d
+		sourceLineageTag: revenue_net
+		summarizeBy: sum
+		sourceColumn: revenue_net
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column revenue_gross
+		dataType: double
+		lineageTag: d7fc76cd-3d96-4d7a-9690-3457057dc310
+		sourceLineageTag: revenue_gross
+		summarizeBy: sum
+		sourceColumn: revenue_gross
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column customer_code
+		dataType: string
+		lineageTag: efb662e8-7811-4c83-89e8-4b753322311f
+		sourceLineageTag: customer_code
+		summarizeBy: none
+		sourceColumn: customer_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_identified_customer
+		dataType: int64
+		formatString: 0
+		lineageTag: e3532d26-b8b9-4762-9995-4a1f080a0b82
+		sourceLineageTag: is_identified_customer
+		summarizeBy: sum
+		sourceColumn: is_identified_customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d4b2dcfa-e587-4b1f-aef2-949df40ddc2d
+		sourceLineageTag: customer_id
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_gender
+		dataType: string
+		lineageTag: 8c903a05-ec66-41b1-9161-2dbaac711579
+		sourceLineageTag: customer_gender
+		summarizeBy: none
+		sourceColumn: customer_gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_age_range
+		dataType: string
+		lineageTag: 31932ede-4dff-49c8-ad2d-48db30b38e94
+		sourceLineageTag: customer_age_range
+		summarizeBy: none
+		sourceColumn: customer_age_range
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_nationality
+		dataType: string
+		lineageTag: 89018f98-2a4a-4d84-8223-df106e98078a
+		sourceLineageTag: customer_nationality
+		summarizeBy: none
+		sourceColumn: customer_nationality
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating
+		dataType: int64
+		formatString: 0
+		lineageTag: 005d908a-b0c8-46a3-8768-ff5eefeeb3bb
+		sourceLineageTag: rating
+		summarizeBy: none
+		sourceColumn: rating
+
+		annotation SummarizationSetBy = Automatic
+
+	column cogs
+		dataType: double
+		lineageTag: d2a9fcb8-5dd1-46b8-9c75-a02d9a69cf99
+		sourceLineageTag: cogs
+		summarizeBy: none
+		sourceColumn: cogs
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sales = entity
+		mode: directLake
+		source
+			entityName: bi_eod_sales
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
+
+	changedProperty = Name
+

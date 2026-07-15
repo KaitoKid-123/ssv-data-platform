@@ -1,0 +1,44 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "ForEach",
+        "type": "ForEach",
+        "dependsOn": [],
+        "typeProperties": {
+          "items": {
+            "value": "@range(0, 30)",
+            "type": "Expression"
+          },
+          "isSequential": true,
+          "activities": [
+            {
+              "name": "Invoke pipeline",
+              "type": "InvokePipeline",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "waitOnCompletion": true,
+                "operationType": "InvokeFabricPipeline",
+                "pipelineId": "27ac6611-66ec-40fe-b981-6249fe5a62f9",
+                "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                "parameters": {
+                  "run_date": "@formatDateTime(adddays('2025-11-01', item()), 'yyyy-MM-dd')"
+                }
+              },
+              "externalReferences": {
+                "connection": "89ae6ae9-bc29-4e16-a80b-ca6eae0d14db"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

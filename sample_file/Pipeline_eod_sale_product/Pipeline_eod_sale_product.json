@@ -1,0 +1,881 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Hq_Mongo fab": {
+            "type": "string"
+        },
+        "lh_eod_sales": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "Pipeline_eod_sale_product",
+            "type": "pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Set variable",
+                        "type": "SetVariable",
+                        "dependsOn": [],
+                        "policy": {
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "variableName": "v_run_date",
+                            "value": {
+                                "value": "@if(empty(pipeline().parameters.run_date), formatDateTime(addDays(addHours(utcNow(), 7), -1), 'yyyy-MM-dd'), pipeline().parameters.run_date)",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "nb_ingest_pg",
+                        "type": "TridentNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "Set variable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "0cdd92fb-e3b3-4590-97e6-eb00ffc07494",
+                            "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                            "parameters": {
+                                "running_date": {
+                                    "value": {
+                                        "value": "@variables('v_run_date')",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "nb_ingest_dlm",
+                        "type": "TridentNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "Set variable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "554098f5-5098-4b3d-8d52-f907e9595c16",
+                            "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                            "parameters": {
+                                "running_date": {
+                                    "value": {
+                                        "value": "@variables('v_run_date')",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "cp_mongo_sale_bill",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Set variable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "source": {
+                                "type": "MongoDbAtlasSource",
+                                "batchSize": 100,
+                                "filter": {
+                                    "value": "@concat('{\"documentDate\":{\"$gte\":{\"$date\":\"', formatDateTime(addHours(concat(variables('v_run_date'),'T00:00:00Z'),-7),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"},\"$lt\":{\"$date\":\"', formatDateTime(addHours(concat(variables('v_run_date'),'T00:00:00Z'),17),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"}}}')",
+                                    "type": "Expression"
+                                },
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "type": "MongoDbAtlasCollection",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "collection": "sale_bill",
+                                        "database": "report"
+                                    },
+                                    "version": "1.1",
+                                    "externalReferences": {
+                                        "connection": "[parameters('Hq_Mongo fab')]"
+                                    }
+                                }
+                            },
+                            "sink": {
+                                "type": "LakehouseTableSink",
+                                "tableActionOption": "OverwriteSchema",
+                                "partitionOption": "None",
+                                "applyVOrder": false,
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "linkedService": {
+                                        "name": "lh_eod_sales",
+                                        "properties": {
+                                            "annotations": [],
+                                            "type": "Lakehouse",
+                                            "typeProperties": {
+                                                "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                                                "artifactId": "[parameters('lh_eod_sales')]",
+                                                "rootFolder": "Tables"
+                                            }
+                                        }
+                                    },
+                                    "type": "LakehouseTable",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "schema": "bronze",
+                                        "table": "sale_bill"
+                                    }
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "_id",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "_id",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "documentDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "documentDate",
+                                            "physicalType": "timestamp"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "postingDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "postingDate",
+                                            "physicalType": "timestamp"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "paymentMethod",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "paymentMethod",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "deliveryOrderNo",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "deliveryOrderNo",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeCode",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeCode",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeName",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeName",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeType",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeType",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "cash",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "cash",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "voucher",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "voucher",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "receivableAmount",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "receivableAmount",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "cashAtBank",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "cashAtBank",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "customerGender",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "customerGender",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "customerAgeRange",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "customerAgeRange",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "customerNationality",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "customerNationality",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "staffId",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "staffId",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "staffName",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "staffName",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "originalVoucherCode",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "originalVoucherCode",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "saleNormalItems",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "saleNormalItems",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "transactionPromotions",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "transactionPromotions",
+                                            "physicalType": "string"
+                                        }
+                                    }
+                                ],
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                },
+                                "columnFlattenSettings": {
+                                    "treatArrayAsString": true,
+                                    "treatStructAsString": false,
+                                    "flattenColumnDelimiter": "."
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "cp_mongo_return",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Set variable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "source": {
+                                "type": "MongoDbAtlasSource",
+                                "batchSize": 100,
+                                "filter": {
+                                    "value": "@concat('{\"documentDate\":{\"$gte\":{\"$date\":\"', formatDateTime(addHours(concat(variables('v_run_date'),'T00:00:00Z'),-7),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"},\"$lt\":{\"$date\":\"', formatDateTime(addHours(concat(variables('v_run_date'),'T00:00:00Z'),17),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"}}}')",
+                                    "type": "Expression"
+                                },
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "type": "MongoDbAtlasCollection",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "collection": "sale_return_bill",
+                                        "database": "report"
+                                    },
+                                    "version": "1.1",
+                                    "externalReferences": {
+                                        "connection": "[parameters('Hq_Mongo fab')]"
+                                    }
+                                }
+                            },
+                            "sink": {
+                                "type": "LakehouseTableSink",
+                                "tableActionOption": "OverwriteSchema",
+                                "partitionOption": "None",
+                                "applyVOrder": false,
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "linkedService": {
+                                        "name": "lh_eod_sales",
+                                        "properties": {
+                                            "annotations": [],
+                                            "type": "Lakehouse",
+                                            "typeProperties": {
+                                                "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                                                "artifactId": "[parameters('lh_eod_sales')]",
+                                                "rootFolder": "Tables"
+                                            }
+                                        }
+                                    },
+                                    "type": "LakehouseTable",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "schema": "bronze",
+                                        "table": "sale_return_bill"
+                                    }
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "_id",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "_id",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "documentDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "documentDate",
+                                            "physicalType": "timestamp"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "postingDate",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "postingDate",
+                                            "physicalType": "timestamp"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "paymentMethod",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "paymentMethod",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "deliveryOrderNo",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "deliveryOrderNo",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeCode",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeCode",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeName",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeName",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "storeType",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "storeType",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "cash",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "cash",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "voucher",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "voucher",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "receivableAmount",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "receivableAmount",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "cashAtBank",
+                                            "type": "Int64"
+                                        },
+                                        "sink": {
+                                            "name": "cashAtBank",
+                                            "physicalType": "long"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "supplierCode",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "supplierCode",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "supplierName",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "supplierName",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "customerNote",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "customerNote",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "saleNormalItems",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "saleNormalItems",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "transactionPromotions",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "transactionPromotions",
+                                            "physicalType": "string"
+                                        }
+                                    }
+                                ],
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                },
+                                "columnFlattenSettings": {
+                                    "treatArrayAsString": true,
+                                    "treatStructAsString": false,
+                                    "flattenColumnDelimiter": "."
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "cp_mongo_partner_store",
+                        "type": "Copy",
+                        "dependsOn": [
+                            {
+                                "activity": "Set variable",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "source": {
+                                "type": "MongoDbAtlasSource",
+                                "batchSize": 100,
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "type": "MongoDbAtlasCollection",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "collection": "partner_store",
+                                        "database": "delivery_order"
+                                    },
+                                    "version": "1.1",
+                                    "externalReferences": {
+                                        "connection": "[parameters('Hq_Mongo fab')]"
+                                    }
+                                }
+                            },
+                            "sink": {
+                                "type": "LakehouseTableSink",
+                                "tableActionOption": "OverwriteSchema",
+                                "partitionOption": "None",
+                                "applyVOrder": false,
+                                "datasetSettings": {
+                                    "annotations": [],
+                                    "linkedService": {
+                                        "name": "lh_eod_sales",
+                                        "properties": {
+                                            "annotations": [],
+                                            "type": "Lakehouse",
+                                            "typeProperties": {
+                                                "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                                                "artifactId": "[parameters('lh_eod_sales')]",
+                                                "rootFolder": "Tables"
+                                            }
+                                        }
+                                    },
+                                    "type": "LakehouseTable",
+                                    "schema": [],
+                                    "typeProperties": {
+                                        "schema": "bronze",
+                                        "table": "partner_store"
+                                    }
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "_id.$oid",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "_id",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "partner_store_id",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "partner_store_id",
+                                            "physicalType": "string"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "partner_source",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "partner_source",
+                                            "physicalType": "string"
+                                        }
+                                    }
+                                ],
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                },
+                                "columnFlattenSettings": {
+                                    "treatArrayAsString": false,
+                                    "treatStructAsString": false,
+                                    "flattenColumnDelimiter": "."
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "nb_transform",
+                        "type": "TridentNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "cp_mongo_partner_store",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "cp_mongo_return",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "cp_mongo_sale_bill",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "nb_ingest_pg",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            },
+                            {
+                                "activity": "nb_ingest_dlm",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "88e0eccc-15dd-4605-baa2-c21aa63f3eb0",
+                            "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                            "parameters": {
+                                "running_date": {
+                                    "value": {
+                                        "value": "@variables('v_run_date')",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "nb_dq_check",
+                        "type": "TridentNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "nb_transform",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "9bd83b68-7b3b-450e-9d76-0194228b3fb1",
+                            "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                            "parameters": {
+                                "running_date": {
+                                    "value": {
+                                        "value": "@variables('v_run_date')",
+                                        "type": "Expression"
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "nb_bi_refresh",
+                        "type": "TridentNotebook",
+                        "dependsOn": [
+                            {
+                                "activity": "nb_dq_check",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "typeProperties": {
+                            "notebookId": "63ad7443-c30e-4c62-86f9-7ce03cb13a75",
+                            "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+                            "parameters": {}
+                        }
+                    }
+                ],
+                "parameters": {
+                    "run_date": {
+                        "type": "string",
+                        "defaultValue": "\"\""
+                    }
+                },
+                "variables": {
+                    "v_run_date": {
+                        "type": "String"
+                    }
+                },
+                "lastModifiedByObjectId": "8e9df914-f121-46be-88ae-3aa2b60d6c14",
+                "lastPublishTime": "2026-07-10T15:30:19Z"
+            },
+            "dependsOn": []
+        }
+    ]
+}

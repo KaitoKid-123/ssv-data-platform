@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # PySpark 4.x needs a JDK; mirrors the local dev setup (Temurin 21).
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: "Install (package + test extras: pyspark, pytest, chispa)"
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[test]" build
+
+      - name: Smoke import
+        run: python -c "import ssv_data, ssv_data.runtime.pipeline; print('ssv_data', ssv_data.__version__ if hasattr(ssv_data,'__version__') else 'ok')"
+
+      # Unit + local-Spark e2e (functional-core transforms run without any external source).
+      - name: Run tests
+        run: PYTHONPATH=. python -m pytest -q
+
+      - name: Build wheel
+        run: python -m build --wheel
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssv_data-wheel
+          path: dist/*.whl
+          if-no-files-found: error

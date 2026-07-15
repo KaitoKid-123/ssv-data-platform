@@ -1,0 +1,134 @@
+table 'Sales Daily'
+	lineageTag: 36863800-b433-4800-a225-f05a49abac59
+	sourceLineageTag: [gold].[bi_eod_sales_daily]
+
+	column report_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: eeb0abe9-8e91-4fac-b12a-55c0ab36eb0f
+		sourceLineageTag: report_date
+		summarizeBy: none
+		sourceColumn: report_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 80561c56-ec50-4f6b-a43e-b62e8830a5c0
+		sourceLineageTag: year
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_key
+		dataType: string
+		lineageTag: b180a7c6-9040-46a0-86c3-e6848dfd6809
+		sourceLineageTag: month_key
+		summarizeBy: none
+		sourceColumn: month_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column week_start
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0b50adf0-9410-40f7-a3dd-422567e89fd1
+		sourceLineageTag: week_start
+		summarizeBy: none
+		sourceColumn: week_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: int64
+		formatString: 0
+		lineageTag: 130718a4-0cd7-45b6-8460-fa043b83a067
+		sourceLineageTag: is_weekend
+		summarizeBy: sum
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 15fc9fb2-ca1d-4fcb-998e-6e1e9a7b61fb
+		sourceLineageTag: channel
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column baskets
+		dataType: int64
+		formatString: 0
+		lineageTag: 0ca68b48-0ab3-4795-8a8f-6161b833bb66
+		sourceLineageTag: baskets
+		summarizeBy: sum
+		sourceColumn: baskets
+
+		annotation SummarizationSetBy = Automatic
+
+	column stores
+		dataType: int64
+		formatString: 0
+		lineageTag: 404f6387-43b8-4479-9476-2893b8376811
+		sourceLineageTag: stores
+		summarizeBy: sum
+		sourceColumn: stores
+
+		annotation SummarizationSetBy = Automatic
+
+	column units
+		dataType: int64
+		formatString: 0
+		lineageTag: 679688cb-2b75-4458-84be-d19feae2f863
+		sourceLineageTag: units
+		summarizeBy: sum
+		sourceColumn: units
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue_net
+		dataType: double
+		lineageTag: aaa06d29-1226-4aab-9d98-2a6d17fc28c3
+		sourceLineageTag: revenue_net
+		summarizeBy: sum
+		sourceColumn: revenue_net
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column revenue_gross
+		dataType: double
+		lineageTag: cc7d8dc6-dccd-4984-8741-fa202a43eb89
+		sourceLineageTag: revenue_gross
+		summarizeBy: sum
+		sourceColumn: revenue_gross
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column basket_size
+		dataType: double
+		lineageTag: e268e840-7fb3-4129-b47a-763f3f855c28
+		sourceLineageTag: basket_size
+		summarizeBy: sum
+		sourceColumn: basket_size
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Sales Daily' = entity
+		mode: directLake
+		source
+			entityName: bi_eod_sales_daily
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
+
+	changedProperty = Name
+

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
+  "version": "4.0",
+  "datasetReference": {
+    "byConnection": {
+      "connectionString": "Data Source=powerbi://api.powerbi.com/v1.0/myorg/RetailSales_Analysis;initial catalog=Sales;integrated security=ClaimsToken;semanticmodelid=96783bbe-02d2-4ccd-9b66-15df675f631c"
+    }
+  }
+}
