@@ -1,0 +1,105 @@
+{
+ "items": [
+  {
+   "displayName": "EOD Sales Product Dashboard",
+   "id": "dba0e6f8-781a-4580-9b5a-860c7f188a01",
+   "type": "Report"
+  },
+  {
+   "displayName": "Sales",
+   "id": "96783bbe-02d2-4ccd-9b66-15df675f631c",
+   "type": "SemanticModel"
+  },
+  {
+   "displayName": "lh_eod_sales",
+   "id": "dadb9079-d131-444d-98a5-48c79c080513",
+   "type": "SQLEndpoint"
+  },
+  {
+   "displayName": "Custom_Env",
+   "id": "e31708f0-df03-4b50-94cf-602fc36d0525",
+   "type": "Environment"
+  },
+  {
+   "displayName": "bronze.py",
+   "id": "ae9e490e-4ccd-41f4-9fc5-3fd32a1589c2",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "pipeline.py",
+   "id": "eddf2ce0-876b-416c-8e02-42cb18fab8ab",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "main.py",
+   "id": "88e0eccc-15dd-4605-baa2-c21aa63f3eb0",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "lh_eod_sales",
+   "id": "73acfe9c-d474-456f-868a-b9b2c8b3ec05",
+   "type": "Lakehouse"
+  },
+  {
+   "displayName": "silver.py",
+   "id": "5ff98f73-9572-41e2-9248-e6edc1815d94",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "gold.py",
+   "id": "8dc98260-4ee2-4cff-a0a2-9dafa162381b",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "Pipeline_eod_sale_product",
+   "id": "27ac6611-66ec-40fe-b981-6249fe5a62f9",
+   "type": "DataPipeline"
+  },
+  {
+   "displayName": "nb_ingest_pg.py",
+   "id": "0cdd92fb-e3b3-4590-97e6-eb00ffc07494",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_ingest_dlm.py",
+   "id": "554098f5-5098-4b3d-8d52-f907e9595c16",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "Notebook_test",
+   "id": "18efc6f8-2d09-4d0a-bdce-295f8c05a924",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "dq_check.py",
+   "id": "e9612438-6482-401e-92d3-e51c2b0e9a46",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_dq_check.py",
+   "id": "9bd83b68-7b3b-450e-9d76-0194228b3fb1",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "simulators.py",
+   "id": "9def3df2-8948-4fcf-b366-11e46ea673ea",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "fake_data.py",
+   "id": "05515d03-ae01-405a-bb24-5d3dd258c59b",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "Pipeline_backfill_eod",
+   "id": "6f258da5-f87e-4eb0-9eb6-4524f47c42d3",
+   "type": "DataPipeline"
+  },
+  {
+   "displayName": "nb_bi_refresh.py",
+   "id": "63ad7443-c30e-4c62-86f9-7ce03cb13a75",
+   "type": "Notebook"
+  }
+ ],
+ "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63"
+}

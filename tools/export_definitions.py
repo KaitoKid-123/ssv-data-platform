@@ -25,6 +25,17 @@ TYPE_PATHS = {  # itemType -> (api path segment, definition format)
 
 def main() -> None:
     items = list_items(WS)
+    # manifest: (old) item ids so deploy_definitions.py can remap references when
+    # restoring into a NEW workspace (pipeline->notebook ids, report->model id,
+    # DirectLake expression -> workspace/lakehouse ids, notebook -> lakehouse/env ids).
+    os.makedirs(OUT, exist_ok=True)
+    import json
+    with open(os.path.join(OUT, "manifest.json"), "w") as f:
+        json.dump({"workspaceId": WS,
+                   "items": [{"id": i["id"], "type": i["type"],
+                              "displayName": i["displayName"]} for i in items]},
+                  f, indent=1, sort_keys=True)
+    print(f"manifest: {len(items)} items")
     exported = 0
     for it in sorted(items, key=lambda x: (x["type"], x["displayName"])):
         tp = TYPE_PATHS.get(it["type"])

@@ -234,5 +234,10 @@ real system: nested Mongo documents, the relational + dim tables, the DLM payloa
   workspace item definitions into `fabric_items/`), `verify_run.py` (idempotent pipeline
   run + DAX diff vs `tools/baseline_sales_daily.json` — synthetic data is deterministic,
   any drift = regression). Auth: SPN env vars, falling back to `az` CLI login.
-- **`fabric_items/`**: exported definitions (notebooks/pipelines/TMDL/PBIR) — the
-  workspace's state in reviewable text form; re-export via `tools/export_definitions.py`.
+- **`fabric_items/`**: exported definitions (notebooks/pipelines/TMDL/PBIR) + `manifest.json`
+  (item ids for reference remapping) — the workspace's state in reviewable text form;
+  re-export via `tools/export_definitions.py`.
+- **Restore / disaster recovery**: `tools/deploy_definitions.py` pushes `fabric_items/` back —
+  in-place updates on the same workspace, or full rebuild into a NEW workspace
+  (`--workspace <id>`) with automatic GUID remapping (lakehouse/notebook/model refs);
+  then `tools/deploy_wheel.py` + seed/backfill for data.
