@@ -107,16 +107,25 @@ const pipeline = frame("pipeline", "Pipeline_eod_sale_product (daily; run_date e
 
 const backfill = box("backfill", "Pipeline_backfill_eod\nForEach (Sequential) per day", { w: 220, h: 46 });
 
-const deploy = frame("deploy", "Deploy flow (ssv_data 0.1.4)", { dir: "row", gap: 52, align: "middle", stroke: "#999999" }, [
-  box("repo", "Local repo\nssv_data lib + 24 tests\nsample_file/*.ipynb", { w: 170, h: 60 }),
-  box("wheel", "python -m build\nssv_data-0.1.4.whl", { w: 160, h: 46 }),
+// CI/CD lane — wheel goes through GitHub; the SPN does the deploy (no human hands)
+const cicd = frame("cicd", "CI/CD — GitHub KaitoKid-123/ssv-data-platform (private)", { dir: "row", gap: 46, align: "middle", stroke: "#2da44e" }, [
+  box("repo", "Dev ssv_data (local)\ncommit / PR", { w: 150, h: 46 }),
+  box("ci", "CI — mỗi push/PR\npytest 24 tests + build wheel", { w: 200, h: 46 }),
+  box("cd", "CD deploy.yml\nnút bấm / tag v* — pytest gate", { w: 200, h: 46 }),
+  box("spn", "SPN spn-fabric-cicd\nworkspace Member\n(3 GitHub secrets)", { w: 160, h: 60 }),
   box("env", "Custom_Env\nstaging → publish", { w: 150, h: 46 }),
-  box("nbs", "Workspace notebooks\n(updateDefinition — cells only)", { w: 200, h: 46 }),
-  box("tmdl", "Semantic model (TMDL)\n+ Report (PBIR) via API", { w: 190, h: 46 }),
 ]);
 
-renderTree(d2, phantom("root2", "EOD Sales — orchestration + deploy", { dir: "col", gap: 44 }, [
-  pipeline, backfill, deploy,
+// Notebook/model lane — the UI is the source of truth; git holds backup + restore/DR
+const nblane = frame("nblane", "Notebooks / Model — dev trực tiếp trên Fabric UI (thin-shell rule)", { dir: "row", gap: 46, align: "middle", stroke: "#9673a6" }, [
+  box("ui", "Sửa notebook / model / report\ntrên Fabric UI", { w: 190, h: 46 }),
+  box("exp", "export_definitions.py\n→ fabric_items/ + manifest.json\n(backup có history)", { w: 210, h: 60 }),
+  box("res", "deploy_definitions.py\nrestore in-place / DR sang ws mới\n(tự remap GUID)", { w: 220, h: 60 }),
+  box("ver", "verify_run.py\nrun ngày idempotent + DAX diff\nvs baseline 30 ngày", { w: 200, h: 60 }),
+]);
+
+renderTree(d2, phantom("root2", "EOD Sales — orchestration + deploy + CI/CD", { dir: "col", gap: 44 }, [
+  pipeline, backfill, cicd, nblane,
 ]), [40, 60]);
 
 for (const a of ["cp1", "cp2", "cp3", "nbpg", "nbdlm"]) {
@@ -126,11 +135,13 @@ for (const a of ["cp1", "cp2", "cp3", "nbpg", "nbdlm"]) {
 d2.link("tr", "dq", "");
 d2.link("dq", "birf", "Succeeded");
 d2.link("backfill", "pipeline", "invoke per run_date", { dash: true });  // to the frame border, not through nodes
-d2.link("repo", "wheel", "build");
-d2.link("wheel", "env", "upload + publish");
-d2.link("repo", "nbs", "push cells", { dash: true });
-d2.link("env", "nbs", "attached", { dash: true });
-d2.link("nbs", "tmdl", "", { dash: true });
+d2.link("repo", "ci", "push");
+d2.link("ci", "cd", "merge / tag");
+d2.link("cd", "spn", "secrets");
+d2.link("spn", "env", "upload + publish");
+d2.link("cd", "ver", "option verify", { dash: true });
+d2.link("ui", "exp", "backup", { dash: true });
+d2.link("exp", "res", "khi cần restore", { dash: true });
 
 const r2 = d2.validate();
 console.log("P2 VALIDATE:", JSON.stringify({ ok: r2.ok, errors: r2.errors, warnings: r2.warnings }));
