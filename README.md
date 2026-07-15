@@ -5,7 +5,7 @@ pandas + Airflow end-of-day (EOD) sales ETL to a Fabric-native OneLake Delta pip
 ingesting from **MongoDB, PostgreSQL and a REST API**, transforming through
 **bronze → silver → gold**, and guarding output with a **data-quality gate**.
 
-![CI](https://github.com/<user>/ssv-data-platform/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/KaitoKid-123/ssv-data-platform/actions/workflows/ci.yml/badge.svg)
 
 The pipeline is deployed and verified end-to-end in Fabric against real sources
 (MongoDB Atlas, Aiven PostgreSQL, a Cloudflare-Workers mock for the DLM API), and the
