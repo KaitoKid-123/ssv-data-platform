@@ -88,13 +88,13 @@ demonstration that the right tool depends on the *shape* of the data:
 > re-expands them); Copy then serialises the whole array to a JSON string, which silver
 > parses with `from_json` → `explode`. Takeaway: no-code *can* handle nested Mongo
 > documents — you just have to understand how the connector maps arrays. (`bronze.py` also
-> ships an equivalent Spark-connector path, `ingest_mongo_bills`, if you prefer code.)
+> ships an equivalent Spark-connector path, `ingest_mongo`, if you prefer code.)
 
 ---
 
 ## Data-quality gate
 
-`pipelines/eod_sale/dq_check.py` validates the gold fact **for the run day** and raises
+`dq_check.py` (notebook `nb_dq_check` in the pipeline) validates the gold fact **for the run day** and raises
 on any violation, so the pipeline activity goes red instead of silently publishing:
 row count > 0, no null `transaction_id` / `product_id` / `report_date`, and
 `final_amount` present for completed rows.
@@ -130,22 +130,34 @@ let the same `bronze_ingest` skip sources that arrive by shortcut in prod but by
 ssv_data/                     # SHARED library -> built as a wheel, attached to a Fabric Environment
   config.py                   # bronze/silver/gold names, VN tz offset (+7h)
   runtime/  context.py window.py pipeline.py logging.py   # PipelineContext + MedallionPipeline (Template Method)
-  io/       readers.py writers.py                         # source readers; write_delta(replaceWhere)
+  io/       readers.py writers.py                         # windowed/semi-join JDBC readers; write_delta(replaceWhere)
   schema/   registry.py cast.py                           # StructTypes; fill-missing + cast-by-schema
-  transforms/ common.py       # pure df->df: pivot_status_times, range_join_effective, coalesce_sources
+  transforms/ common.py scd.py # pure df->df: pivot/range-join/coalesce + SCD2 (scd2_apply, as_of_join)
 
-pipelines/eod_sale/           # PER-PIPELINE code -> thin Fabric notebooks chained via %run
-  bronze.py                   # per-source ingest: ingest_mongo_bills / _partner_store / postgres / dlm
-  silver.py  gold.py          # +7h day, explode items, dims; ~80-col fact + customer/canceled/price logic
-  pipeline.py                 # EodSalePipeline(MedallionPipeline)
-  dq_check.py                 # data-quality gate (fail loud)
-  simulators.py               # deterministic multi-day synthetic data + seed/export helpers
-  api_service.py worker.js Dockerfile   # DLM mock (FastAPI + Cloudflare Worker)
-  *.sql *.js mongo_import/    # generated source-loadable seed artifacts
+sample_file/                  # PER-PIPELINE code — local copies of the Fabric notebooks (%run chain)
+  bronze.py.ipynb             # per-source ingest: Mongo (windowed) / PG (windowed+semi-join/full) / DLM
+  silver.py.ipynb gold.py.ipynb  # +7h day, explode items, SCD2 dims; ~80-col fact, as-of joins
+  pipeline.py.ipynb dq_check.py.ipynb nb_bi_refresh.py.ipynb simulators.py.ipynb ...
+  Pipeline_eod_sale_product/  # Fabric Data Pipeline definition (activities incl. nb_bi_refresh)
+  create_report_pbir.py       # PBIR report generator (API-built dashboard pages)
 
-tests/                        # unit + e2e on a local SparkSession (no Fabric)
-.github/workflows/ci.yml      # JDK21 + py3.12 -> pytest -> build wheel
+fabric_items/                 # EXPORTED workspace definitions (13 notebooks, 2 pipelines,
+                              #   TMDL model, PBIR report) + manifest.json — backup & DR source
+tools/                        # fabric_api.py (SPN/az auth + LRO) · deploy_wheel.py ·
+                              #   export_definitions.py · deploy_definitions.py (restore/DR)
+                              #   · verify_run.py + baseline_sales_daily.json
+sample_service/               # DLM mock (FastAPI + Cloudflare Worker + Dockerfile)
+tests/                        # 24 unit + e2e tests on a local SparkSession (no Fabric)
+docs/architecture/            # eod-sales-flow.drawio (4 pages) + rendered PNG previews
+docs/superpowers/specs/       # design specs (windowed extraction, SCD2, dashboard extension)
+.github/workflows/            # ci.yml (pytest+build) · deploy.yml (wheel -> Fabric via SPN)
 ```
+
+Architecture diagrams: [docs/architecture/eod-sales-flow.drawio](docs/architecture/eod-sales-flow.drawio)
+(4 pages: simple overview, Fabric platform map, medallion data flow, orchestration + CI/CD) —
+PNG previews render inline: [overview](docs/architecture/eod-sales-flow-overview.png) ·
+[platform](docs/architecture/eod-sales-flow-platform.png) · [data flow](docs/architecture/eod-sales-flow-data.png) ·
+[orchestration](docs/architecture/eod-sales-flow-orchestration.png).
 
 ---
 
