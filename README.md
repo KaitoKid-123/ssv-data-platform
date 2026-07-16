@@ -262,6 +262,10 @@ real system: nested Mongo documents, the relational + dim tables, the DLM payloa
   workspace item definitions into `fabric_items/`), `verify_run.py` (idempotent pipeline
   run + DAX diff vs `tools/baseline_sales_daily.json` — synthetic data is deterministic,
   any drift = regression). Auth: SPN env vars, falling back to `az` CLI login.
+- **Ops**: `MedallionPipeline.run()` appends step timings/status to `ops.run_log` (0.1.5);
+  `.github/workflows/monitor.yml` (daily cron) opens a GitHub issue on any Failed run.
+  Secrets stay as Fabric Environment Spark properties for now — Azure Key Vault needs an
+  Azure subscription, which this tenant doesn't have yet.
 - **`fabric_items/`**: exported definitions (notebooks/pipelines/TMDL/PBIR) + `manifest.json`
   (item ids for reference remapping) — the workspace's state in reviewable text form;
   re-export via `tools/export_definitions.py`.
