@@ -150,6 +150,7 @@ sample_service/               # DLM mock (FastAPI + Cloudflare Worker + Dockerfi
 tests/                        # 24 unit + e2e tests on a local SparkSession (no Fabric)
 docs/architecture/            # eod-sales-flow.drawio (4 pages) + rendered PNG previews
 docs/superpowers/specs/       # design specs (windowed extraction, SCD2, dashboard extension)
+docs/adr/                     # architecture decision records (ADR-0001: logic-in-notebooks trade-off)
 .github/workflows/            # ci.yml (pytest+build) · deploy.yml (wheel -> Fabric via SPN)
 ```
 
