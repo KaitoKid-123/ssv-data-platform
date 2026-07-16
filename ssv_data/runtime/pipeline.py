@@ -50,15 +50,49 @@ class MedallionPipeline(ABC):
     def run(self, running_date: str, with_ingest: bool = True) -> None:
         ctx = self.context(running_date)
         self.logger.info(f"[{self.name}] start {running_date}")
+        steps = ([("ingest", self.ingest)] if with_ingest else []) \
+            + [("silver", self.build_silver), ("gold", self.build_gold)]
+        records = []
+        for step, fn in steps:
+            started = datetime.utcnow()
+            try:
+                fn(ctx)
+                records.append((step, "Succeeded", started, datetime.utcnow(), None))
+            except Exception as e:
+                records.append((step, "Failed", started, datetime.utcnow(), str(e)[:2000]))
+                self._write_run_log(ctx, running_date, records)
+                self.logger.exception(f"[{self.name}] FAILED {running_date} at {step}")
+                raise
+        self._write_run_log(ctx, running_date, records)
+        self.logger.info(f"[{self.name}] done {running_date}")
+
+    def _write_run_log(self, ctx, running_date: str, records) -> None:
+        """Append step timings/status to ops.run_log (ops_run_log when schemas are off).
+
+        Observability only — best-effort by design: a logging failure must never fail
+        the run, so any exception here is swallowed into a warning."""
         try:
-            if with_ingest:
-                self.ingest(ctx)
-            self.build_silver(ctx)
-            self.build_gold(ctx)
-            self.logger.info(f"[{self.name}] done {running_date}")
-        except Exception:
-            self.logger.exception(f"[{self.name}] FAILED {running_date}")
-            raise
+            from pyspark.sql import types as T
+            schema = T.StructType([
+                T.StructField("pipeline", T.StringType()),
+                T.StructField("run_date", T.StringType()),
+                T.StructField("step", T.StringType()),
+                T.StructField("status", T.StringType()),
+                T.StructField("started_at", T.TimestampType()),
+                T.StructField("ended_at", T.TimestampType()),
+                T.StructField("duration_s", T.DoubleType()),
+                T.StructField("error", T.StringType()),
+            ])
+            rows = [(self.name, running_date, step, status, a, b,
+                     (b - a).total_seconds(), err)
+                    for step, status, a, b, err in records]
+            if getattr(ctx, "schema_enabled", True):
+                ctx.spark.sql("CREATE SCHEMA IF NOT EXISTS ops")
+            (ctx.spark.createDataFrame(rows, schema)
+                .write.format(getattr(ctx, "table_format", "delta"))
+                .mode("append").saveAsTable(ctx.table("ops", "run_log")))
+        except Exception as e:  # noqa: BLE001 — observability must not break the pipeline
+            self.logger.warning(f"[{self.name}] run_log write skipped: {e}")
 
     def backfill(self, start_date: str, end_date: str, with_ingest: bool = True) -> None:
         """Inclusive start, exclusive end. Reruns run() per day; idempotent via replaceWhere."""

@@ -1,0 +1,6 @@
+Fabric run failures in the last 48h (workspace RetailSales_Analysis):
+
+- **Pipeline_eod_sale_product** run `5f724246-10c9-4c20-9357-25e19ae14ab8` started 2026-07-14 08:36 UTC → **Failed**
+  Operation on target nb_transform failed: Notebook execution failed at Notebook service with http status code - '200', please check the Run logs on Notebook, additional details - '{"errorCode":"200","errorName":"AnalysisException","errorValue":"[_LEGACY_ERROR_TEMP_DELTA_0007] A schema mismatch detect
+
+_Reported by `.github/workflows/monitor.yml`._

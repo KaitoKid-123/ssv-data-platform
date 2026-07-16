@@ -1,0 +1,36 @@
+name: Monitor Fabric runs
+
+# Daily watchdog: any Failed/Cancelled pipeline run in the last 26h -> GitHub issue
+# (= email notification), since Fabric-side alerting (Teams/Outlook activities,
+# Activator) needs interactive connection consent we don't have headlessly.
+on:
+  schedule:
+    - cron: "45 18 * * *"   # 01:45 VN, after the daily-run window
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      FABRIC_TENANT_ID: ${{ secrets.FABRIC_TENANT_ID }}
+      FABRIC_CLIENT_ID: ${{ secrets.FABRIC_CLIENT_ID }}
+      FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests
+      - name: Check recent runs
+        run: python tools/check_runs.py --hours 26
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="Fabric pipeline failure — $(date -u +%Y-%m-%d)"
+          gh issue create --title "$TITLE" --body-file failures.txt || \
+          gh issue create --title "$TITLE" --body "check_runs.py failed — see workflow logs"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ssv-data"
-version = "0.1.4"
+version = "0.1.5"
 description = "Shared data-platform library for SSV Fabric medallion pipelines"
 requires-python = ">=3.10"
 dependencies = [
