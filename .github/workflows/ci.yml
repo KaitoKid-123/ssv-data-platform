@@ -1,9 +1,21 @@
 name: CI
 
+# CI only runs when something it actually verifies changes (allowlist).
+# Docs / diagrams / fabric_items backups / notebook copies don't affect pytest+build.
 on:
   push:
     branches: [main]
+    paths:
+      - "ssv_data/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
   pull_request:
+    paths:
+      - "ssv_data/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 concurrency:
