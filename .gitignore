@@ -21,6 +21,9 @@ derby.log
 # NOTE: tests/ and sample_service/ are REAL SOURCE (pytest suite, DLM mock) — never ignore them.
 mongo_import/
 sample_source/
+sample_file/
+docs/adr/
+docs/superpowers/
 *.seed.sql
 
 # Local agent/session config
