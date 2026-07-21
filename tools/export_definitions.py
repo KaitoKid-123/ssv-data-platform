@@ -43,6 +43,7 @@ def main() -> None:
                   f, indent=1, sort_keys=True)
     print(f"manifest: {len(items)} items")
     exported = 0
+    current: set = set()
     for it in sorted(items, key=lambda x: (x["type"], x["displayName"])):
         tp = TYPE_PATHS.get(it["type"])
         if not tp:
@@ -62,6 +63,18 @@ def main() -> None:
                 f.write(decode(p))
         print(f"exported {it['type']}/{safe} ({len(parts)} parts)")
         exported += 1
+        current.add((it["type"], safe))
+    # prune stale item dirs (e.g. scratch notebooks from a DEV export) so
+    # fabric_items/ stays an exact mirror of the exported workspace
+    import shutil
+    for itype in TYPE_PATHS:
+        tdir = os.path.join(OUT, itype)
+        if not os.path.isdir(tdir):
+            continue
+        for name in os.listdir(tdir):
+            if (itype, name) not in current:
+                shutil.rmtree(os.path.join(tdir, name))
+                print(f"pruned stale {itype}/{name}")
     print(f"done: {exported} items -> {OUT}/")
 
 
