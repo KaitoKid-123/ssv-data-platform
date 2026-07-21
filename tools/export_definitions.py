@@ -4,7 +4,9 @@ Covers: Notebook (ipynb), DataPipeline, SemanticModel (TMDL), Report (PBIR).
 Lakehouse/Environment have no exportable definition — the wheel lives in dist/ + CI,
 data is rebuildable (simulators + backfill).
 
-Usage:  python tools/export_definitions.py
+Usage:  python tools/export_definitions.py [--workspace WS_ID]
+        (default: PROD. Pass the DEV workspace id to capture DEV work into
+         fabric_items/ before promoting it with deploy_definitions.py.)
 """
 import os
 import sys
@@ -24,14 +26,18 @@ TYPE_PATHS = {  # itemType -> (api path segment, definition format)
 
 
 def main() -> None:
-    items = list_items(WS)
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--workspace", default=WS, help="workspace to export (default: PROD)")
+    ws = ap.parse_args().workspace
+    items = list_items(ws)
     # manifest: (old) item ids so deploy_definitions.py can remap references when
     # restoring into a NEW workspace (pipeline->notebook ids, report->model id,
     # DirectLake expression -> workspace/lakehouse ids, notebook -> lakehouse/env ids).
     os.makedirs(OUT, exist_ok=True)
     import json
     with open(os.path.join(OUT, "manifest.json"), "w") as f:
-        json.dump({"workspaceId": WS,
+        json.dump({"workspaceId": ws,
                    "items": [{"id": i["id"], "type": i["type"],
                               "displayName": i["displayName"]} for i in items]},
                   f, indent=1, sort_keys=True)
@@ -45,7 +51,7 @@ def main() -> None:
         safe = it["displayName"].replace("/", "_")
         base = os.path.join(OUT, it["type"], safe)
         try:
-            parts = get_definition(path_seg, it["id"], fmt)
+            parts = get_definition(path_seg, it["id"], fmt, ws=ws)
         except Exception as e:
             print(f"SKIP {it['type']}/{safe}: {e}")
             continue

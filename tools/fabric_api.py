@@ -74,10 +74,11 @@ def call(method: str, path: str, expect_lro_result: bool = False, **kw) -> reque
     raise TimeoutError(f"LRO did not finish: {loc}")
 
 
-def get_definition(item_type_path: str, item_id: str, fmt: str | None = None) -> list[dict]:
+def get_definition(item_type_path: str, item_id: str, fmt: str | None = None,
+                   ws: str = WS) -> list[dict]:
     """Item definition parts [{path, payload(b64), payloadType}]. item_type_path e.g. 'notebooks'."""
     q = f"?format={fmt}" if fmt else ""
-    r = call("POST", f"/workspaces/{WS}/{item_type_path}/{item_id}/getDefinition{q}",
+    r = call("POST", f"/workspaces/{ws}/{item_type_path}/{item_id}/getDefinition{q}",
              expect_lro_result=True)
     return r.json()["definition"]["parts"]
 
