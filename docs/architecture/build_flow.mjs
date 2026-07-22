@@ -116,12 +116,13 @@ const cicd = frame("cicd", "CI/CD — GitHub KaitoKid-123/ssv-data-platform (pri
   box("env", "Custom_Env\nstaging → publish", { w: 150, h: 46 }),
 ]);
 
-// Notebook/model lane — the UI is the source of truth; git holds backup + restore/DR
-const nblane = frame("nblane", "Notebooks / Model — dev trực tiếp trên Fabric UI (thin-shell rule)", { dir: "row", gap: 46, align: "middle", stroke: "#9673a6" }, [
-  box("ui", "Sửa notebook / model / report\ntrên Fabric UI", { w: 190, h: 46 }),
-  box("exp", "export_definitions.py\n→ fabric_items/ + manifest.json\n(backup có history)", { w: 210, h: 60 }),
-  box("res", "deploy_definitions.py\nrestore in-place / DR sang ws mới\n(tự remap GUID)", { w: 220, h: 60 }),
+// Notebook/model lane — dev in DEV on the UI; git holds the mirror; promote to PROD
+const nblane = frame("nblane", "Notebooks / Model — dev trên Fabric UI (DEV) → promote PROD", { dir: "row", gap: 42, align: "middle", stroke: "#9673a6" }, [
+  box("ui", "Workspace DEV\nsửa notebook / model trên UI", { w: 170, h: 46 }),
+  box("exp", "export_definitions --workspace DEV\n→ fabric_items/ (layout name.Type\n+ manifest + parameter.yml)", { w: 230, h: 60 }),
+  box("res", "deploy_definitions.py\npromote → PROD / restore / DR\n(remap GUID, publish song song)", { w: 220, h: 60 }),
   box("ver", "verify_run.py\nrun ngày idempotent + DAX diff\nvs baseline 30 ngày", { w: 200, h: 60 }),
+  box("fcicd", "cùng folder cũng deploy được bằng:\nfabric-cicd / Git integration", { w: 210, h: 46, stroke: "#bbbbbb" }),
 ]);
 
 renderTree(d2, phantom("root2", "EOD Sales — orchestration + deploy + CI/CD", { dir: "col", gap: 44 }, [
@@ -140,8 +141,8 @@ d2.link("ci", "cd", "merge / tag");
 d2.link("cd", "spn", "secrets");
 d2.link("spn", "env", "upload + publish");
 d2.link("cd", "ver", "option verify", { dash: true });
-d2.link("ui", "exp", "backup", { dash: true });
-d2.link("exp", "res", "khi cần restore", { dash: true });
+d2.link("ui", "exp", "capture", { dash: true });
+d2.link("exp", "res", "promote / DR", { dash: true });
 
 const r2 = d2.validate();
 console.log("P2 VALIDATE:", JSON.stringify({ ok: r2.ok, errors: r2.errors, warnings: r2.warnings }));
