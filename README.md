@@ -141,8 +141,9 @@ sample_file/                  # PER-PIPELINE code — local copies of the Fabric
   Pipeline_eod_sale_product/  # Fabric Data Pipeline definition (activities incl. nb_bi_refresh)
   create_report_pbir.py       # PBIR report generator (API-built dashboard pages)
 
-fabric_items/                 # EXPORTED workspace definitions (13 notebooks, 2 pipelines,
-                              #   TMDL model, PBIR report) + manifest.json — backup & DR source
+fabric_items/                 # EXPORTED workspace definitions in git-integration layout
+                              #   (<name>.<Type>/ + manifest.json + parameter.yml) — backup,
+                              #   promotion & DR source; fabric-cicd/Git-integration ready
 tools/                        # fabric_api.py (SPN/az auth + LRO) · deploy_wheel.py ·
                               #   export_definitions.py · deploy_definitions.py (restore/DR)
                               #   · verify_run.py + baseline_sales_daily.json

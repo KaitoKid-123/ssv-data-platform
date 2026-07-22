@@ -1,0 +1,16 @@
+# fabric-cicd parameterization (see docs/fabric-cicd-evaluation.md).
+# Dynamic variables resolve per TARGET workspace at deploy time — no hardcoded target GUIDs.
+# find_value = the PROD GUIDs baked into the exported definitions.
+find_replace:
+    # PROD workspace id -> target workspace
+    - find_value: "56f47ab7-4707-4862-9a9f-f8c05b6b4d63"
+      replace_value:
+          DEV: "$workspace.$id"
+    # PROD lakehouse id -> same-name lakehouse in the target
+    - find_value: "73acfe9c-d474-456f-868a-b9b2c8b3ec05"
+      replace_value:
+          DEV: "$items.Lakehouse.lh_eod_sales.$id"
+    # PROD Custom_Env id -> same-name environment in the target
+    - find_value: "e31708f0-df03-4b50-94cf-602fc36d0525"
+      replace_value:
+          DEV: "$items.Environment.Custom_Env.$id"

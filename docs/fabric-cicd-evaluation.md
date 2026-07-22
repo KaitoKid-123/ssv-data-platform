@@ -45,6 +45,14 @@ publish_all_items(fw)
 | Hỗ trợ dài hạn | ✅ Microsoft maintain, thêm item type liên tục | Tự vá khi API đổi |
 | Deploy Environment + libraries | Có hỗ trợ item Environment (chưa thử với wheel) | `deploy_wheel.py` đã chạy prod |
 
+## ✅ Đã áp dụng (2026-07-16, cùng ngày)
+
+- `fabric_items/` migrate sang layout `<name>.<Type>` (git-integration) — fabric-cicd
+  trỏ thẳng vào folder này publish thành công, không cần converter.
+- `parameter.yml` (dynamic variables) check-in tại `fabric_items/parameter.yml`.
+- `deploy_definitions.py`: discovery qua `.platform` + **publish song song trong từng
+  type** (13 notebooks: ~3 phút → 63s; fabric-cicd vẫn nhanh hơn nhờ bỏ LRO polling dày).
+
 ## Kết luận & khuyến nghị
 
 1. **Giữ nguyên bộ tools hiện tại cho vòng đời hằng ngày** (backup, promotion, DR) —
