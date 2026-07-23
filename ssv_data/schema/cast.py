@@ -5,14 +5,15 @@ A `schema` is a dict {column: type_token}. Type tokens match the original job:
 """
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
-    ArrayType, DoubleType, LongType, StringType, TimestampType,
+    ArrayType, BooleanType, DoubleType, LongType, StringType, TimestampType,
 )
- 
+
 _TYPE_MAP = {
     "str": StringType(),
     "int": LongType(),
     "float": DoubleType(),
     "date": TimestampType(),
+    "bool": BooleanType(),
 }
  
  
