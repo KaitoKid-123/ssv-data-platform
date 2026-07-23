@@ -1,0 +1,965 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Set variable",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "policy": {
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "variableName": "v_run_date",
+          "value": {
+            "value": "@if(empty(pipeline().parameters.run_date), formatDateTime(addDays(addHours(utcNow(), 7), -1), 'yyyy-MM-dd'), pipeline().parameters.run_date)",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "cp_mongo_pay_bill",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Set variable",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "MongoDbAtlasSource",
+            "batchSize": 100,
+            "filter": {
+              "value": "@concat('{\"transactionTime\":{\"$gte\":{\"$date\":\"', concat(variables('v_run_date'),'T00:00:00.000Z'), '\"},\"$lt\":{\"$date\":\"', formatDateTime(addDays(concat(variables('v_run_date'),'T00:00:00Z'),1),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"}}}')",
+              "type": "Expression"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "MongoDbAtlasCollection",
+              "schema": [],
+              "typeProperties": {
+                "collection": "pay_bill_transaction",
+                "database": "report"
+              },
+              "version": "1.1",
+              "externalReferences": {
+                "connection": "98b6e285-28c7-4602-af8a-b24427455ad0"
+              }
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "OverwriteSchema",
+            "partitionOption": "None",
+            "applyVOrder": false,
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "lh_eod_sales",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+                    "artifactId": "c2f2aef9-ef22-4916-8d70-f94611d77399",
+                    "rootFolder": "Tables"
+                  }
+                }
+              },
+              "type": "LakehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": "bronze",
+                "table": "pay_bill_transaction"
+              }
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "transactionId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "transactionId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "postingTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "postingTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeType",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeType",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "movementType",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "movementType",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "hasInvoice",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "hasInvoice",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerAgeRange",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "customerAgeRange",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerNationality",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerNationality",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerGender",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerGender",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "edcType",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "edcType",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "cash",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "cash",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "serviceName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "serviceName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "amountBeforeVat",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "amountBeforeVat",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "amountVat",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "amountVat",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalAmountWithoutPromotion",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalAmountWithoutPromotion",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "staffId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "staffId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "staffName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "staffName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "posId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "posId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "paymentMethod",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "paymentMethod",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "paymentMethodValue",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "paymentMethodValue",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionRecordStartTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionRecordStartTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionRecordEndTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionRecordEndTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "promotionTotalAmount",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "promotionTotalAmount",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalProductPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalProductPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalVoucherPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalVoucherPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalBillPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalBillPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "serviceFee",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "serviceFee",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerServiceFee",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerServiceFee",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "skipValidateOver50Percent",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "skipValidateOver50Percent",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "receivableAmount",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "receivableAmount",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "prePaid",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "prePaid",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "syncedSapStatus",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "syncedSapStatus",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "syncedSapTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "syncedSapTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "orderInfo",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "paybillItems",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "paybillItems",
+                  "physicalType": "string"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "cp_mongo_top_up",
+        "type": "Copy",
+        "dependsOn": [
+          {
+            "activity": "Set variable",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "MongoDbAtlasSource",
+            "batchSize": 100,
+            "filter": {
+              "value": "@concat('{\"transactionTime\":{\"$gte\":{\"$date\":\"', concat(variables('v_run_date'),'T00:00:00.000Z'), '\"},\"$lt\":{\"$date\":\"', formatDateTime(addDays(concat(variables('v_run_date'),'T00:00:00Z'),1),'yyyy-MM-ddTHH:mm:ss.000Z'), '\"}}}')",
+              "type": "Expression"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "MongoDbAtlasCollection",
+              "schema": [],
+              "typeProperties": {
+                "collection": "top_up_transaction",
+                "database": "report"
+              },
+              "version": "1.1",
+              "externalReferences": {
+                "connection": "98b6e285-28c7-4602-af8a-b24427455ad0"
+              }
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "OverwriteSchema",
+            "partitionOption": "None",
+            "applyVOrder": false,
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "lh_eod_sales",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+                    "artifactId": "c2f2aef9-ef22-4916-8d70-f94611d77399",
+                    "rootFolder": "Tables"
+                  }
+                }
+              },
+              "type": "LakehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": "bronze",
+                "table": "top_up_transaction"
+              }
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "transactionId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "transactionId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "postingTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "postingTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "storeType",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "storeType",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "movementType",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "movementType",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "hasInvoice",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "hasInvoice",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerAgeRange",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "customerAgeRange",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerNationality",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerNationality",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerGender",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerGender",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "edcType",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "edcType",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "cash",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "cash",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "serviceName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "serviceName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "amountBeforeVat",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "amountBeforeVat",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "amountVat",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "amountVat",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalAmountWithoutPromotion",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalAmountWithoutPromotion",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "staffId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "staffId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "staffName",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "staffName",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "posId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "posId",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "paymentMethod",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "paymentMethod",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "paymentMethodValue",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "paymentMethodValue",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionRecordStartTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionRecordStartTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "transactionRecordEndTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "transactionRecordEndTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "promotionTotalAmount",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "promotionTotalAmount",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalProductPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalProductPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalVoucherPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalVoucherPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "totalBillPromotionAmountWithoutTax",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "totalBillPromotionAmountWithoutTax",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "serviceFee",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "serviceFee",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "customerServiceFee",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "customerServiceFee",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "skipValidateOver50Percent",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "skipValidateOver50Percent",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "receivableAmount",
+                  "type": "Int64"
+                },
+                "sink": {
+                  "name": "receivableAmount",
+                  "physicalType": "long"
+                }
+              },
+              {
+                "source": {
+                  "name": "prePaid",
+                  "type": "Boolean"
+                },
+                "sink": {
+                  "name": "prePaid",
+                  "physicalType": "boolean"
+                }
+              },
+              {
+                "source": {
+                  "name": "syncedSapStatus",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "syncedSapStatus",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "syncedSapTime",
+                  "type": "DateTime"
+                },
+                "sink": {
+                  "name": "syncedSapTime",
+                  "physicalType": "timestamp"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "orderInfo",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "topUpItems",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "topUpItems",
+                  "physicalType": "string"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "nb_transform_service",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "cp_mongo_pay_bill",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "cp_mongo_top_up",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": "55587645-d5d1-4bea-a9fa-22316a7e571a",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+          "parameters": {
+            "running_date": {
+              "value": {
+                "value": "@variables('v_run_date')",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "seed": {
+              "value": "false",
+              "type": "bool"
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "run_date": {
+        "type": "string",
+        "defaultValue": "\"\""
+      }
+    },
+    "variables": {
+      "v_run_date": {
+        "type": "String"
+      }
+    }
+  }
+}
