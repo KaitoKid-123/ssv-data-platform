@@ -21,7 +21,6 @@
     "ETL_Sales/pipelines/eod_sale_service": [
       "Pipeline_eod_sale_service",
       "bi_service_refresh.py",
-      "bronze_service.py",
       "dq_service.py",
       "gold_service.py",
       "main_service.py",
