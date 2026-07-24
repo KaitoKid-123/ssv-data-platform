@@ -950,6 +950,29 @@
             }
           }
         }
+      },
+      {
+        "name": "nb_bi_refresh_service",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "nb_transform_service",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": "c43031b1-926e-4ff4-8b00-d41f39929275",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337"
+        }
       }
     ],
     "parameters": {

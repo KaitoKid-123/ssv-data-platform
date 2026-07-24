@@ -3,7 +3,7 @@
   "version": "4.0",
   "datasetReference": {
     "byConnection": {
-      "connectionString": "Data Source=powerbi://api.powerbi.com/v1.0/myorg/RetailSales_Analysis;initial catalog=Sales;integrated security=ClaimsToken;semanticmodelid=96783bbe-02d2-4ccd-9b66-15df675f631c"
+      "connectionString": "Data Source=powerbi://api.powerbi.com/v1.0/myorg/RetailSales_Analysis_DEV;initial catalog=Sales;integrated security=ClaimsToken;semanticmodelid=8a9e6963-734a-4e1b-820c-cf7e48f7730c"
     }
   }
 }

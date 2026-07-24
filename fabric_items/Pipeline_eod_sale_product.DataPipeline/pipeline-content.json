@@ -36,8 +36,8 @@
           "secureInput": false
         },
         "typeProperties": {
-          "notebookId": "0cdd92fb-e3b3-4590-97e6-eb00ffc07494",
-          "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+          "notebookId": "19a2eec8-07e9-413a-b4d7-a14ff72c7f88",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
           "parameters": {
             "running_date": {
               "value": {
@@ -68,8 +68,8 @@
           "secureInput": false
         },
         "typeProperties": {
-          "notebookId": "554098f5-5098-4b3d-8d52-f907e9595c16",
-          "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+          "notebookId": "5d0f43f5-173a-4844-a5ce-6f465c6903b5",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
           "parameters": {
             "running_date": {
               "value": {
@@ -134,8 +134,8 @@
                   "annotations": [],
                   "type": "Lakehouse",
                   "typeProperties": {
-                    "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
-                    "artifactId": "73acfe9c-d474-456f-868a-b9b2c8b3ec05",
+                    "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+                    "artifactId": "c2f2aef9-ef22-4916-8d70-f94611d77399",
                     "rootFolder": "Tables"
                   }
                 }
@@ -419,8 +419,8 @@
                   "annotations": [],
                   "type": "Lakehouse",
                   "typeProperties": {
-                    "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
-                    "artifactId": "73acfe9c-d474-456f-868a-b9b2c8b3ec05",
+                    "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+                    "artifactId": "c2f2aef9-ef22-4916-8d70-f94611d77399",
                     "rootFolder": "Tables"
                   }
                 }
@@ -670,8 +670,8 @@
                   "annotations": [],
                   "type": "Lakehouse",
                   "typeProperties": {
-                    "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
-                    "artifactId": "73acfe9c-d474-456f-868a-b9b2c8b3ec05",
+                    "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
+                    "artifactId": "c2f2aef9-ef22-4916-8d70-f94611d77399",
                     "rootFolder": "Tables"
                   }
                 }
@@ -775,8 +775,8 @@
           "secureInput": false
         },
         "typeProperties": {
-          "notebookId": "88e0eccc-15dd-4605-baa2-c21aa63f3eb0",
-          "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+          "notebookId": "28703ce4-f6f4-45af-94ad-705290611cac",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
           "parameters": {
             "running_date": {
               "value": {
@@ -807,8 +807,8 @@
           "secureInput": false
         },
         "typeProperties": {
-          "notebookId": "9bd83b68-7b3b-450e-9d76-0194228b3fb1",
-          "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+          "notebookId": "9bbead7c-dfcb-4be4-bacf-da30e21cae09",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
           "parameters": {
             "running_date": {
               "value": "@variables('v_run_date')",
@@ -836,8 +836,8 @@
           "secureInput": false
         },
         "typeProperties": {
-          "notebookId": "63ad7443-c30e-4c62-86f9-7ce03cb13a75",
-          "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63",
+          "notebookId": "6eb099f3-204a-4675-a657-a9faddaa282d",
+          "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337",
           "parameters": {}
         }
       }

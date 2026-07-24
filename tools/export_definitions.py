@@ -22,7 +22,7 @@ from fabric_api import WS, decode, get_definition, list_items
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "fabric_items")
-KEEP_FILES = {"manifest.json", "parameter.yml"}   # root-level metadata, never pruned
+KEEP_FILES = {"manifest.json", "parameter.yml", "folders.json"}   # root-level metadata, never pruned
 
 TYPE_PATHS = {  # itemType -> (api path segment, definition format)
     "Notebook": ("notebooks", "ipynb"),

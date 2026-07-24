@@ -1,6 +1,6 @@
 expression 'DirectLake - lh_eod_sales' =
 		let
-		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/56f47ab7-4707-4862-9a9f-f8c05b6b4d63/73acfe9c-d474-456f-868a-b9b2c8b3ec05", [HierarchicalNavigation=true])
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/b90465fb-bc4c-4a8b-a5bc-3d5eb2991337/c2f2aef9-ef22-4916-8d70-f94611d77399", [HierarchicalNavigation=true])
 		in
 		    Source
 	lineageTag: 7a31bb81-a38c-4c1f-bf3e-fdfec41632de

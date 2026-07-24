@@ -2,104 +2,164 @@
  "items": [
   {
    "displayName": "EOD Sales Product Dashboard",
-   "id": "dba0e6f8-781a-4580-9b5a-860c7f188a01",
+   "id": "64a987a3-0ac7-4c8d-9bca-fa0201fac34b",
+   "type": "Report"
+  },
+  {
+   "displayName": "EOD Sale Service Dashboard",
+   "id": "b1e9714e-12b8-4781-8d74-4a2105b1dad7",
    "type": "Report"
   },
   {
    "displayName": "Sales",
-   "id": "96783bbe-02d2-4ccd-9b66-15df675f631c",
+   "id": "8a9e6963-734a-4e1b-820c-cf7e48f7730c",
+   "type": "SemanticModel"
+  },
+  {
+   "displayName": "Sales Service",
+   "id": "09410985-d3c8-45f2-9c7c-3a30286fa7d3",
    "type": "SemanticModel"
   },
   {
    "displayName": "lh_eod_sales",
-   "id": "dadb9079-d131-444d-98a5-48c79c080513",
+   "id": "98f1ce24-84ec-4ba5-9028-709540103b54",
    "type": "SQLEndpoint"
   },
   {
    "displayName": "Custom_Env",
-   "id": "e31708f0-df03-4b50-94cf-602fc36d0525",
+   "id": "1708163a-7c44-4799-88e9-8754df044221",
    "type": "Environment"
   },
   {
-   "displayName": "bronze.py",
-   "id": "ae9e490e-4ccd-41f4-9fc5-3fd32a1589c2",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "pipeline.py",
-   "id": "eddf2ce0-876b-416c-8e02-42cb18fab8ab",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "main.py",
-   "id": "88e0eccc-15dd-4605-baa2-c21aa63f3eb0",
-   "type": "Notebook"
-  },
-  {
    "displayName": "lh_eod_sales",
-   "id": "73acfe9c-d474-456f-868a-b9b2c8b3ec05",
+   "id": "c2f2aef9-ef22-4916-8d70-f94611d77399",
    "type": "Lakehouse"
   },
   {
-   "displayName": "silver.py",
-   "id": "5ff98f73-9572-41e2-9248-e6edc1815d94",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "gold.py",
-   "id": "8dc98260-4ee2-4cff-a0a2-9dafa162381b",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "Pipeline_eod_sale_product",
-   "id": "27ac6611-66ec-40fe-b981-6249fe5a62f9",
-   "type": "DataPipeline"
-  },
-  {
-   "displayName": "nb_ingest_pg.py",
-   "id": "0cdd92fb-e3b3-4590-97e6-eb00ffc07494",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "nb_ingest_dlm.py",
-   "id": "554098f5-5098-4b3d-8d52-f907e9595c16",
-   "type": "Notebook"
-  },
-  {
    "displayName": "Notebook_test",
-   "id": "18efc6f8-2d09-4d0a-bdce-295f8c05a924",
+   "id": "b23282b9-eaaa-4e08-a17e-3779326a2759",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "bronze.py",
+   "id": "725fd8eb-6306-4579-ade3-69fb78938239",
    "type": "Notebook"
   },
   {
    "displayName": "dq_check.py",
-   "id": "e9612438-6482-401e-92d3-e51c2b0e9a46",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "nb_dq_check.py",
-   "id": "9bd83b68-7b3b-450e-9d76-0194228b3fb1",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "simulators.py",
-   "id": "9def3df2-8948-4fcf-b366-11e46ea673ea",
+   "id": "43fd51a3-78cc-47d3-97b0-d989fb9e5fe9",
    "type": "Notebook"
   },
   {
    "displayName": "fake_data.py",
-   "id": "05515d03-ae01-405a-bb24-5d3dd258c59b",
+   "id": "215c933b-9931-4079-8609-722661ba776e",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "gold.py",
+   "id": "16d68674-4ad2-432b-959e-2dbf90ef3db6",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "main.py",
+   "id": "28703ce4-f6f4-45af-94ad-705290611cac",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_bi_refresh.py",
+   "id": "6eb099f3-204a-4675-a657-a9faddaa282d",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_dq_check.py",
+   "id": "9bbead7c-dfcb-4be4-bacf-da30e21cae09",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_ingest_dlm.py",
+   "id": "5d0f43f5-173a-4844-a5ce-6f465c6903b5",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "nb_ingest_pg.py",
+   "id": "19a2eec8-07e9-413a-b4d7-a14ff72c7f88",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "pipeline.py",
+   "id": "f3bbfdfd-398e-4840-b549-2ed4b2ce5109",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "silver.py",
+   "id": "6b255c2e-553f-4e72-84a0-0048d2d2c44b",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "simulators.py",
+   "id": "deb517e1-3194-4105-9ac7-746854bf8038",
    "type": "Notebook"
   },
   {
    "displayName": "Pipeline_backfill_eod",
-   "id": "6f258da5-f87e-4eb0-9eb6-4524f47c42d3",
+   "id": "b5dabcdc-2545-4fa0-ba6f-70ab3eb4aff0",
    "type": "DataPipeline"
   },
   {
-   "displayName": "nb_bi_refresh.py",
-   "id": "63ad7443-c30e-4c62-86f9-7ce03cb13a75",
+   "displayName": "Pipeline_eod_sale_product",
+   "id": "d1d1b816-178e-4ada-a4b2-0aa3fa65e07a",
+   "type": "DataPipeline"
+  },
+  {
+   "displayName": "drill_seed",
+   "id": "708389fc-74b0-4949-9efc-4258b5f39534",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "act_pipeline_failures",
+   "id": "fd2fcf0d-0b6d-48f1-847f-1e9b771b7151",
+   "type": "Reflex"
+  },
+  {
+   "displayName": "simulators_service.py",
+   "id": "83496819-6963-40f1-9f3f-29a71a2656a9",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "silver_service.py",
+   "id": "3a248bf5-8dbf-4007-a527-11e4e7f2a328",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "gold_service.py",
+   "id": "89dccfb5-1880-44ae-b555-f41717877636",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "dq_service.py",
+   "id": "ddc5e0d7-bfd5-4cc2-b213-d8c5d3108fbd",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "pipeline_service.py",
+   "id": "21aa4f58-e912-4a5d-a296-9af35206e63c",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "main_service.py",
+   "id": "55587645-d5d1-4bea-a9fa-22316a7e571a",
+   "type": "Notebook"
+  },
+  {
+   "displayName": "Pipeline_eod_sale_service",
+   "id": "2b9c25d5-acb9-4352-9f3e-9982ea654d6e",
+   "type": "DataPipeline"
+  },
+  {
+   "displayName": "bi_service_refresh.py",
+   "id": "c43031b1-926e-4ff4-8b00-d41f39929275",
    "type": "Notebook"
   }
  ],
- "workspaceId": "56f47ab7-4707-4862-9a9f-f8c05b6b4d63"
+ "workspaceId": "b90465fb-bc4c-4a8b-a5bc-3d5eb2991337"
 }

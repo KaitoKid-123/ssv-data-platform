@@ -11,3 +11,4 @@ annotation PBI_QueryOrder = ["DirectLake - lh_eod_sales"]
 annotation PBI_ProTooling = ["DirectLakeOnOneLakeInWeb","WebModelingEdit"]
 
 ref table Service
+

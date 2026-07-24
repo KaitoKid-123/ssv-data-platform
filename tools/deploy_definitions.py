@@ -188,8 +188,11 @@ def main() -> None:
     ap.add_argument("--workspace", default=WS, help="target workspace id (default: source ws)")
     ap.add_argument("--only", choices=ORDER, help="deploy only this item type")
     ap.add_argument("--item", help="deploy only the item with this displayName")
+    ap.add_argument("--folder", help="deploy only items mapped to this folders.json path "
+                    "(domain-scoped promotion, e.g. ETL_Sales/pipelines/eod_sale_service)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+    folder_of = load_folders()   # {displayName: folderPath}
 
     man = load_manifest()
     ws = args.workspace
@@ -197,6 +200,15 @@ def main() -> None:
     remap: dict = {}
     if ws != man["workspaceId"]:
         remap[man["workspaceId"]] = ws
+        # Reports embed the workspace NAME (not a guid) in their connection string, so
+        # remap source->target name too (e.g. RetailSales_Analysis_DEV -> RetailSales_Analysis).
+        try:
+            src_name = call("GET", f"/workspaces/{man['workspaceId']}").json()["displayName"]
+            tgt_name = call("GET", f"/workspaces/{ws}").json()["displayName"]
+            if src_name != tgt_name:
+                remap[src_name] = tgt_name
+        except Exception as e:  # noqa: BLE001
+            print(f"warn: workspace-name remap skipped: {e}")
     ensure_infra(ws, man, existing, remap, args.dry_run)
 
     found = discover()
@@ -205,7 +217,8 @@ def main() -> None:
     for itype in ORDER:                                 # dependency order between types
         batch = [(n, d) for n, d in found.get(itype, [])
                  if not (args.only and itype != args.only)
-                 and not (args.item and n != args.item)]
+                 and not (args.item and n != args.item)
+                 and not (args.folder and folder_of.get(n) != args.folder)]
         if not batch:
             continue
         if args.dry_run:
