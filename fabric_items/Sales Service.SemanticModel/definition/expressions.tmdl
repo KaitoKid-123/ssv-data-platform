@@ -1,0 +1,8 @@
+expression 'DirectLake - lh_eod_sales' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/56f47ab7-4707-4862-9a9f-f8c05b6b4d63/73acfe9c-d474-456f-868a-b9b2c8b3ec05", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: 7f27dc32-71cb-4123-a52c-88cdefc30dde
+
+	annotation PBI_IncludeFutureArtifacts = True

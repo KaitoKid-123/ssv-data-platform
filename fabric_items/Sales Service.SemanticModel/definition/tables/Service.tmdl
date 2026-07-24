@@ -1,0 +1,223 @@
+table Service
+	lineageTag: 932c33ee-3efa-43e7-bbb5-fb3cef19e8c9
+	sourceLineageTag: [gold].[bi_eod_sale_service]
+
+	measure 'Total Revenue' = SUM('Service'[total_amount])
+		formatString: #,0
+		lineageTag: b3ad04e4-aeb9-4b76-b798-3e6c8766f6cd
+
+	measure 'Commission Income' = SUM('Service'[total_commission])
+		formatString: #,0
+		lineageTag: e54de790-b6aa-41eb-9a09-d84b6e631919
+
+	measure 'Product Cost' = SUM('Service'[purchase_price_with_tax])
+		formatString: #,0
+		lineageTag: 105e1e19-ee14-4ff7-839c-07708de0b580
+
+	measure 'Cost-Service Margin' = SUMX(FILTER('Service','Service'[purchase_price_with_tax]>0),'Service'[total_amount]-'Service'[purchase_price_with_tax])
+		formatString: #,0
+		lineageTag: 1cc968ff-373a-4bbf-a144-70b72fbbd1aa
+
+	measure 'Gross Margin' = [Commission Income] + [Cost-Service Margin]
+		formatString: #,0
+		lineageTag: ced19b4c-135c-4610-9860-debdbd929a7d
+
+	measure 'Margin %' = DIVIDE([Gross Margin],[Total Revenue])
+		formatString: 0.0%
+		lineageTag: eaee1e6f-6d1f-4dda-b209-c21f72330f79
+
+	measure 'Transaction Count' = DISTINCTCOUNT('Service'[transaction_id])
+		formatString: #,0
+		lineageTag: 4f1016e3-4f96-4026-a8af-d79c50c9f772
+
+	measure 'AOV' = DIVIDE([Total Revenue],[Transaction Count])
+		formatString: #,0
+		lineageTag: 40cc861b-7d99-4e75-b3fa-752905defa4b
+
+	column report_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 201c1cc4-6ef1-4150-9d5d-c1247af60c37
+		sourceLineageTag: report_date
+		summarizeBy: none
+		sourceColumn: report_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column service_name
+		dataType: string
+		lineageTag: bb5afae2-17b3-4036-805e-3f0b2dbe680e
+		sourceLineageTag: service_name
+		summarizeBy: none
+		sourceColumn: service_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column provider_id
+		dataType: string
+		lineageTag: cf982fd6-ffcf-45ac-94fa-8f337c0d2513
+		sourceLineageTag: provider_id
+		summarizeBy: none
+		sourceColumn: provider_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_type
+		dataType: string
+		lineageTag: 7a1422c3-e864-45e9-ac54-db3db32c7dd0
+		sourceLineageTag: order_type
+		summarizeBy: none
+		sourceColumn: order_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: string
+		lineageTag: b63d5f86-30df-4c56-8915-b5f22d365764
+		sourceLineageTag: store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_name
+		dataType: string
+		lineageTag: 70d92c04-d047-4c89-975f-86ae2f0ede02
+		sourceLineageTag: store_name
+		summarizeBy: none
+		sourceColumn: store_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column staff_id
+		dataType: string
+		lineageTag: 88137542-7c5c-4db0-abec-b748618233e9
+		sourceLineageTag: staff_id
+		summarizeBy: none
+		sourceColumn: staff_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_method
+		dataType: int64
+		formatString: 0
+		lineageTag: 09bd335c-3a26-4f0e-8250-56b0e8b4318c
+		sourceLineageTag: payment_method
+		summarizeBy: none
+		sourceColumn: payment_method
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_id
+		dataType: string
+		lineageTag: 079f55ba-4af1-425c-b1cb-1c2442c64337
+		sourceLineageTag: transaction_id
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_code
+		dataType: string
+		lineageTag: 95f786fa-1577-44b9-adb5-f3e2544b646e
+		sourceLineageTag: product_code
+		summarizeBy: none
+		sourceColumn: product_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: eae20e69-1531-409a-804a-56dd7a5ca0e0
+		sourceLineageTag: product_name
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: e654b490-cfaa-481c-a3b3-4e533a208645
+		sourceLineageTag: quantity
+		summarizeBy: none
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_amount
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3659aceb-022d-47b6-9875-189f7b39da87
+		sourceLineageTag: total_amount
+		summarizeBy: none
+		sourceColumn: total_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount_before_vat
+		dataType: int64
+		formatString: #,0
+		lineageTag: 73106179-d1b2-4110-ab4b-ec33db6605bc
+		sourceLineageTag: amount_before_vat
+		summarizeBy: none
+		sourceColumn: amount_before_vat
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount_vat
+		dataType: int64
+		formatString: #,0
+		lineageTag: 129503bd-4e59-4e0f-b277-027b921412d8
+		sourceLineageTag: amount_vat
+		summarizeBy: none
+		sourceColumn: amount_vat
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_commission
+		dataType: int64
+		formatString: #,0
+		lineageTag: 45030ebb-55fc-4efc-918a-bfe6e05e257d
+		sourceLineageTag: total_commission
+		summarizeBy: none
+		sourceColumn: total_commission
+
+		annotation SummarizationSetBy = Automatic
+
+	column commission_on_vnd
+		dataType: int64
+		formatString: #,0
+		lineageTag: c61d2714-5d2e-4908-b5b9-c877758ff0af
+		sourceLineageTag: commission_on_vnd
+		summarizeBy: none
+		sourceColumn: commission_on_vnd
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchase_price_with_tax
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9f27a405-68e2-4694-887a-b9783bb7c592
+		sourceLineageTag: purchase_price_with_tax
+		summarizeBy: none
+		sourceColumn: purchase_price_with_tax
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchase_price_without_tax
+		dataType: int64
+		formatString: #,0
+		lineageTag: b8dd536a-ca9b-4f0b-acb3-d676b81d0df6
+		sourceLineageTag: purchase_price_without_tax
+		summarizeBy: none
+		sourceColumn: purchase_price_without_tax
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Service = entity
+		mode: directLake
+		source
+			entityName: bi_eod_sale_service
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
