@@ -1,0 +1,33 @@
+{
+  "_comment": "Folder placement for workspace items (path -> displayNames). deploy_definitions.py reconciles items into these folders on deploy. Items not listed stay at workspace root.",
+  "folders": {
+    "ETL_Sales/pipelines/eod_sale_product": [
+      "Notebook_test",
+      "Pipeline_backfill_eod",
+      "Pipeline_eod_sale_product",
+      "bronze.py",
+      "dq_check.py",
+      "fake_data.py",
+      "gold.py",
+      "main.py",
+      "nb_bi_refresh.py",
+      "nb_dq_check.py",
+      "nb_ingest_dlm.py",
+      "nb_ingest_pg.py",
+      "pipeline.py",
+      "silver.py",
+      "simulators.py"
+    ],
+    "ETL_Sales/pipelines/eod_sale_service": [
+      "Pipeline_eod_sale_service",
+      "bi_service_refresh.py",
+      "bronze_service.py",
+      "dq_service.py",
+      "gold_service.py",
+      "main_service.py",
+      "pipeline_service.py",
+      "silver_service.py",
+      "simulators_service.py"
+    ]
+  }
+}

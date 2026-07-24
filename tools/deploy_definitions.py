@@ -48,6 +48,62 @@ def load_manifest() -> dict:
         return json.load(f)
 
 
+def load_folders() -> dict:
+    """{displayName: folderPath} from fabric_items/folders.json (empty if absent).
+    Items not listed stay at the workspace root."""
+    p = os.path.join(SRC, "folders.json")
+    if not os.path.isfile(p):
+        return {}
+    data = json.load(open(p)).get("folders", {})
+    return {name: path for path, names in data.items() for name in names}
+
+
+def ensure_folder(ws: str, path: str, cache: dict) -> str:
+    """Create the folder hierarchy `path` (e.g. 'ETL_Sales/pipelines/x') idempotently
+    and return the leaf folder id."""
+    if path in cache:
+        return cache[path]
+    idx = {(f["displayName"], f.get("parentFolderId")): f["id"]
+           for f in call("GET", f"/workspaces/{ws}/folders").json()["value"]}
+    parent = None
+    for seg in path.split("/"):
+        if (seg, parent) in idx:
+            parent = idx[(seg, parent)]
+        else:
+            body = {"displayName": seg}
+            if parent:
+                body["parentFolderId"] = parent
+            new = call("POST", f"/workspaces/{ws}/folders", json=body).json()["id"]
+            idx[(seg, parent)] = new
+            print(f"created folder {seg}")
+            parent = new
+    cache[path] = parent
+    return parent
+
+
+def reconcile_folders(ws: str, deployed: set, dry: bool) -> None:
+    """Move each deployed item into its mapped folder (folders.json). Idempotent — items
+    already in place are skipped; unmapped items stay at root. Runs after publish, so a
+    fresh DR/promotion create (which lands at root) ends up in the right folder."""
+    folder_of = load_folders()
+    if not folder_of:
+        return
+    items = {(i["type"], i["displayName"]): i for i in list_items(ws)}
+    cache: dict = {}
+    for itype, name in sorted(deployed):
+        path = folder_of.get(name)
+        it = items.get((itype, name))
+        if not path or not it:
+            continue
+        if dry:
+            print(f"[dry] would place {itype}/{name} in {path}")
+            continue
+        fid = ensure_folder(ws, path, cache)
+        if it.get("folderId") != fid:
+            call("POST", f"/workspaces/{ws}/items/{it['id']}/move", json={"targetFolderId": fid})
+            print(f"placed {itype}/{name} -> {path}")
+
+
 def discover() -> dict:
     """{itemType: [(displayName, dirpath)]} — identity read from each .platform file."""
     found: dict = {t: [] for t in ORDER}
@@ -145,6 +201,7 @@ def main() -> None:
 
     found = discover()
     done = 0
+    deployed: set = set()
     for itype in ORDER:                                 # dependency order between types
         batch = [(n, d) for n, d in found.get(itype, [])
                  if not (args.only and itype != args.only)
@@ -155,6 +212,7 @@ def main() -> None:
             for name, _ in batch:
                 verb = "UPDATE" if (itype, name) in existing else "CREATE"
                 print(f"[dry] would {verb} {itype}/{name}")
+                deployed.add((itype, name))
             done += len(batch)
             continue
         with ThreadPoolExecutor(max_workers=PARALLELISM) as pool:   # parallel within type
@@ -164,10 +222,12 @@ def main() -> None:
                 name, tid, action = fut.result()
                 print(f"{action} {itype}/{name}" + (f" -> {tid}" if action == "created" else ""))
                 existing[(itype, name)] = tid
+                deployed.add((itype, name))
                 old_id = manifest_id(man, itype, name)
                 if old_id and tid != old_id:
                     remap[old_id] = tid          # later types reference this one
                 done += 1
+    reconcile_folders(ws, deployed, args.dry_run)       # place items into their folders.json folder
     print(f"done: {done} item(s){' (dry-run)' if args.dry_run else ''}")
     if ws != man["workspaceId"] and not args.dry_run and not (args.item or args.only):
         print("\nDR checklist còn lại: tools/deploy_wheel.py (wheel vào Environment mới),"
