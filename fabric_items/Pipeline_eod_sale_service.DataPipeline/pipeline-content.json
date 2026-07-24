@@ -87,6 +87,7 @@
           "enableStaging": false,
           "translator": {
             "type": "TabularTranslator",
+            "mapComplexValuesToString": true,
             "mappings": [
               {
                 "source": {
@@ -440,11 +441,51 @@
               },
               {
                 "source": {
-                  "name": "orderInfo",
+                  "name": "orderInfo.orderNo",
                   "type": "String"
                 },
                 "sink": {
-                  "name": "orderInfo",
+                  "name": "order_no",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.serviceId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "service_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.providerId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "provider_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.customerId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "customer_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.orderType",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "order_type",
                   "physicalType": "string"
                 }
               },
@@ -532,6 +573,7 @@
           "enableStaging": false,
           "translator": {
             "type": "TabularTranslator",
+            "mapComplexValuesToString": true,
             "mappings": [
               {
                 "source": {
@@ -885,11 +927,51 @@
               },
               {
                 "source": {
-                  "name": "orderInfo",
+                  "name": "orderInfo.orderNo",
                   "type": "String"
                 },
                 "sink": {
-                  "name": "orderInfo",
+                  "name": "order_no",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.serviceId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "service_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.providerId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "provider_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.customerId",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "customer_id",
+                  "physicalType": "string"
+                }
+              },
+              {
+                "source": {
+                  "name": "orderInfo.orderType",
+                  "type": "String"
+                },
+                "sink": {
+                  "name": "order_type",
                   "physicalType": "string"
                 }
               },
