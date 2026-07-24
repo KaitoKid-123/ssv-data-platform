@@ -34,3 +34,15 @@ audit trail (mỗi sự cố một issue, đóng khi xử lý xong). Không trù
   authoring là việc của UI**, đừng cố hand-craft JSON.
 - Sản phẩm phụ vô hại của drill: partition rỗng `2025-12-15` trong gold
   (0 dòng — không hiện trên dashboard; lần chạy lại ngày đó sẽ replaceWhere đè).
+
+## eod_sale_service (thêm 2026-07-24)
+
+- `Pipeline_eod_sale_service` (PROD `6b2b5a98-…`) đã thêm vào `tools/check_runs.py`
+  WATCH → monitor.yml tự động cảnh báo khi fail, giống 2 pipeline sản phẩm.
+- Lịch chạy: đã tạo **Daily 01:00 VN** (`SE Asia Standard Time`) nhưng **DISABLED**
+  (`enabled=false`) vì Atlas hiện chỉ có data synthetic cho một khoảng ngày cố định —
+  bật lịch khi Mongo có data hằng ngày (hoặc seed synthetic phủ ngày hiện tại), nếu
+  không DQ sẽ đỏ mỗi ngày và monitor mở issue rác. Bật: schedule API `enabled=true`
+  hoặc toggle trên UI (pipeline → Schedule).
+- Activator: rule tương tự có thể thêm cho `Pipeline_eod_sale_service` (Job events →
+  Failed) theo đúng các bước ở trên.

@@ -17,6 +17,7 @@ from fabric_api import WS, call
 WATCH = {
     "Pipeline_eod_sale_product": "27ac6611-66ec-40fe-b981-6249fe5a62f9",
     "Pipeline_backfill_eod": "6f258da5-f87e-4eb0-9eb6-4524f47c42d3",
+    "Pipeline_eod_sale_service": "6b2b5a98-3705-402e-bccd-aa48e958d8ff",
 }
 BAD = {"Failed", "Cancelled"}
 
