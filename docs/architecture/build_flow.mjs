@@ -265,6 +265,54 @@ writeFileSync(`${S}/flow_p1.drawio`, x1);
 writeFileSync(`${S}/flow_p2.drawio`, x2);
 writeFileSync(`${S}/flow_p3.drawio`, x3);
 
+// ---------------- Page 5: eod_sale_service data flow ----------------
+const d4 = new Diagram("network");
+
+const svc_src = frame("svc_sources", "MongoDB", { dir: "col", gap: 24, stroke: SRC }, [
+  icon("svc_c1", "mongodb", "pay_bill_transaction\n(Pay Bill)"),
+  icon("svc_c2", "mongodb", "top_up_transaction\n(Top Up + Pay Card)"),
+]);
+
+const svc_bronze = frame("svc_bronze", "BRONZE — Copy-fed (overwrite per run)", { dir: "col", gap: 10, stroke: BRZ }, [
+  box("svc_b1", "pay_bill_transaction", { w: 240, h: 30 }),
+  box("svc_b2", "top_up_transaction", { w: 240, h: 30 }),
+  box("svc_bnote", "orderInfo (object) + items (array)\n→ JSON string via\nmapComplexValuesToString", { w: 240, h: 60, fill: "#ffe6cc", stroke: BRZ }),
+]);
+
+const svc_silver = frame("svc_silver", "SILVER — conformed", { dir: "col", gap: 10, stroke: SLV }, [
+  box("svc_s1", "sale_service_line\nexplode items · parse orderInfo\nreport_date = date-part (VN-local, no +7h)", { w: 250, h: 60 }),
+  box("svc_s2", "decode demographics\n(shared ssv_data.transforms,\nkeep_unknown_age)", { w: 250, h: 46 }),
+]);
+
+const svc_gold = frame("svc_gold", "GOLD — business", { dir: "col", gap: 10, stroke: GLD }, [
+  box("svc_g1", "fact_eod_sale_service\n57 cols (= legacy ClickHouse)\ngrain (transaction_id, product_code)\npartition report_date + replaceWhere", { w: 260, h: 74 }),
+  box("svc_gate", "DQ gate — grain + null + service_name", { w: 260, h: 34, fill: "#f8cecc", stroke: RED }),
+  box("svc_mart", "bi_eod_sale_service (CTAS mart)", { w: 260, h: 30 }),
+]);
+
+const svc_bi = frame("svc_bi", "BI", { dir: "col", gap: 10, stroke: BIC }, [
+  icon("svc_pbi", "power_bi", "Direct Lake 'Sales Service'\n+ 2-page dashboard"),
+]);
+
+renderTree(d4, phantom("root4", "eod_sale_service — data flow (Pay Bill / Pay Card / Top Up)", { dir: "row", gap: 46, align: "top" },
+  [svc_src, svc_bronze, svc_silver, svc_gold, svc_bi]), [40, 60]);
+
+d4.link("svc_c1", "svc_b1", "Copy (windowed)", { dash: true });
+d4.link("svc_c2", "svc_b2", "Copy (windowed)", { dash: true });
+d4.link("svc_b1", "svc_s1", "");
+d4.link("svc_b2", "svc_s1", "");
+d4.link("svc_s1", "svc_g1", "");
+d4.link("svc_s2", "svc_g1", "");
+d4.link("svc_g1", "svc_gate", "");
+d4.link("svc_gate", "svc_mart", "pass");
+d4.link("svc_mart", "svc_pbi", "Direct Lake");
+
+const r4 = d4.validate();
+console.log("P4 VALIDATE:", JSON.stringify({ ok: r4.ok, errors: r4.errors, warnings: r4.warnings }));
+const x4 = d4.mxfile("eod_sale_service — Data Flow");
+writeFileSync(`${S}/flow_p4.drawio`, x4);
+console.log("written flow_p4.drawio (eod_sale_service)");
+
 // merge: later pages get an id namespace so ids stay unique across the file
 const dia = (x) => x.match(/<diagram[\s\S]*<\/diagram>/)[0];
 const ns = (x, p) => x.replace(/\b(id|source|target|parent)="([^"]*)"/g, (_, a, v) => `${a}="${p}${v}"`);
