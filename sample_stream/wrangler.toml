@@ -1,0 +1,18 @@
+# Cloudflare Worker config for the store_operation Kafka producer.
+# Deploy:  npm i -g wrangler   (or npx)
+#          wrangler secret put KAFKA_REST_URL   # Aiven "Kafka REST API" URI (Karapace)
+#          wrangler secret put KAFKA_USER       # e.g. avnadmin
+#          wrangler secret put KAFKA_PASS
+#          wrangler deploy
+name = "eod-sale-stream-producer"
+main = "producer_worker.js"
+compatibility_date = "2025-06-01"
+
+# Non-secret config (secrets go via `wrangler secret put`, never here).
+[vars]
+KAFKA_TOPIC = "store_operation"
+BATCH = "10"                       # messages produced per cron tick / default /produce batch
+
+# Cron trigger — produce a batch every minute (edit as needed; "*/5 * * * *" = every 5 min).
+[triggers]
+crons = ["* * * * *"]
