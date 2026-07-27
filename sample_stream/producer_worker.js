@@ -105,7 +105,19 @@ function buildMessage(seq) {
   };
 }
 
+function missingEnv(env) {
+  // Secret NAMES must be exactly these (the value goes in the `wrangler secret put` prompt).
+  return ["KAFKA_REST_URL", "KAFKA_USER", "KAFKA_PASS"].filter((k) => !env[k]);
+}
+
 async function produce(env, messages) {
+  const miss = missingEnv(env);
+  if (miss.length) {
+    throw new Error(
+      `Missing secret(s): ${miss.join(", ")}. Set each with:  wrangler secret put <NAME>  ` +
+      `(NAME is the arg; the value is typed at the prompt).`
+    );
+  }
   const topic = env.KAFKA_TOPIC || "store_operation";
   const url = `${env.KAFKA_REST_URL.replace(/\/$/, "")}/topics/${topic}`;
   const body = JSON.stringify({
