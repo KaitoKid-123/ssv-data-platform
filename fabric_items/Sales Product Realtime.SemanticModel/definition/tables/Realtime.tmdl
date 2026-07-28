@@ -1,0 +1,221 @@
+table Realtime
+	lineageTag: 713fdb19-4f62-44aa-9414-33ac5f06ca86
+	sourceLineageTag: [gold].[bi_eod_sale_product_rlt]
+
+	measure 'Revenue' = SUM('Realtime'[total_amount])
+		formatString: #,0
+		lineageTag: efb68f76-7296-43e8-a965-86e829faea26
+
+	measure 'Net Revenue' = SUM('Realtime'[final_amount])
+		formatString: #,0
+		lineageTag: 7c87070c-cde9-43e4-9d90-a81588029bf5
+
+	measure 'Units' = SUM('Realtime'[quantity])
+		formatString: #,0
+		lineageTag: 403206d5-c4a5-4053-bbb2-5d888c7a6159
+
+	measure 'Transactions' = DISTINCTCOUNT('Realtime'[transaction_id])
+		formatString: #,0
+		lineageTag: b6d11826-29e6-439d-b790-fcca205082c5
+
+	measure 'Lines' = COUNTROWS('Realtime')
+		formatString: #,0
+		lineageTag: cec16e5b-f191-46f0-adbb-83be25cfc896
+
+	measure 'AOV' = DIVIDE([Revenue],[Transactions])
+		formatString: #,0
+		lineageTag: 18675023-29d9-46c8-a918-bcf43010ffee
+
+	measure 'Realtime Revenue' = CALCULATE([Revenue], 'Realtime'[source] = "rlt")
+		formatString: #,0
+		lineageTag: 4896509f-8e58-40f1-8ab2-bfe51ed3d7dd
+
+	measure 'Batch Revenue' = CALCULATE([Revenue], 'Realtime'[source] = "eod")
+		formatString: #,0
+		lineageTag: f9653d46-bbfd-45a0-b180-e74659d7d04d
+
+	column report_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e90ad347-cff7-44d8-b919-10f596ec7eec
+		sourceLineageTag: report_date
+		summarizeBy: none
+		sourceColumn: report_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ee394e5b-0ec3-4d6a-b323-4c54514bcf27
+		sourceLineageTag: transaction_time
+		summarizeBy: none
+		sourceColumn: transaction_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column source
+		dataType: string
+		lineageTag: 3d0139af-f50b-40be-adf3-002800c2b687
+		sourceLineageTag: source
+		summarizeBy: none
+		sourceColumn: source
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_id
+		dataType: string
+		lineageTag: c21ff915-cbd4-43d6-a524-a942f111f8c6
+		sourceLineageTag: store_id
+		summarizeBy: none
+		sourceColumn: store_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column store_name
+		dataType: string
+		lineageTag: b41b4897-ff47-46ae-b8af-1c3412e35c44
+		sourceLineageTag: store_name
+		summarizeBy: none
+		sourceColumn: store_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column staff_id
+		dataType: string
+		lineageTag: aa3fe5ca-b894-44f1-9037-4175ef47dc11
+		sourceLineageTag: staff_id
+		summarizeBy: none
+		sourceColumn: staff_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_method_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d366a2f7-cc9d-4f78-aa08-87655f138d75
+		sourceLineageTag: payment_method_id
+		summarizeBy: none
+		sourceColumn: payment_method_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 97a34811-e9a0-4ba7-b22b-1088e3297c1c
+		sourceLineageTag: product_id
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: d49107c3-79c2-4ef6-8e2e-630dca4add51
+		sourceLineageTag: product_name
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_group_name
+		dataType: string
+		lineageTag: 43eae0b1-7684-48d3-83b7-4947e6705bdf
+		sourceLineageTag: product_group_name
+		summarizeBy: none
+		sourceColumn: product_group_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_category_name
+		dataType: string
+		lineageTag: 7b8d8086-7742-46d7-b35d-2b389a2bd1a5
+		sourceLineageTag: product_category_name
+		summarizeBy: none
+		sourceColumn: product_category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column retail_business_type
+		dataType: string
+		lineageTag: acaa1009-0dfe-4c59-8de9-c5b75c3263db
+		sourceLineageTag: retail_business_type
+		summarizeBy: none
+		sourceColumn: retail_business_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: bbf56647-e781-463e-a293-a2b32c3be75e
+		sourceLineageTag: quantity
+		summarizeBy: none
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_price
+		dataType: double
+		formatString: #,0
+		lineageTag: a22ea236-9409-42b9-bdac-151d2f1b2675
+		sourceLineageTag: product_price
+		summarizeBy: none
+		sourceColumn: product_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_amount
+		dataType: double
+		formatString: #,0
+		lineageTag: d26d23a4-c119-45d8-9605-fcfb4ab5989e
+		sourceLineageTag: total_amount
+		summarizeBy: none
+		sourceColumn: total_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_amount_no_tax
+		dataType: double
+		formatString: #,0
+		lineageTag: aa407aaa-8a14-4172-83a6-8af2ae8d066b
+		sourceLineageTag: total_amount_no_tax
+		summarizeBy: none
+		sourceColumn: total_amount_no_tax
+
+		annotation SummarizationSetBy = Automatic
+
+	column final_amount
+		dataType: double
+		formatString: #,0
+		lineageTag: 5e4da0a9-746b-4858-8558-8d85c7b9c4b9
+		sourceLineageTag: final_amount
+		summarizeBy: none
+		sourceColumn: final_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_gender
+		dataType: string
+		lineageTag: cf690f05-59aa-4508-9ddb-07fcf4499e6f
+		sourceLineageTag: customer_gender
+		summarizeBy: none
+		sourceColumn: customer_gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_id
+		dataType: string
+		lineageTag: 4acfe25b-83ac-48c0-9f35-e1e14c438130
+		sourceLineageTag: transaction_id
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Realtime = entity
+		mode: directLake
+		source
+			entityName: bi_eod_sale_product_rlt
+			schemaName: gold
+			expressionSource: 'DirectLake - lh_eod_sales'
