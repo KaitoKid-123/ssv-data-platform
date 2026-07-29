@@ -33,3 +33,6 @@ failures.txt
 .DS_Store
 .idea/
 .vscode/
+# Onboarding deck + its generator — keep local, do NOT commit (per request)
+*.pptx
+tools/build_onboarding_pptx.py
