@@ -33,6 +33,8 @@ failures.txt
 .DS_Store
 .idea/
 .vscode/
-# Onboarding deck + its generator — keep local, do NOT commit (per request)
+# Onboarding materials + their generators — keep local, do NOT commit (per request)
 *.pptx
 tools/build_onboarding_pptx.py
+docs/ssv-data-platform-onboarding.pdf
+tools/build_onboarding_pdf.py
