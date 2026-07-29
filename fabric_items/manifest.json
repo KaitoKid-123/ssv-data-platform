@@ -36,11 +36,6 @@
    "type": "Lakehouse"
   },
   {
-   "displayName": "Notebook_test",
-   "id": "b23282b9-eaaa-4e08-a17e-3779326a2759",
-   "type": "Notebook"
-  },
-  {
    "displayName": "bronze.py",
    "id": "725fd8eb-6306-4579-ade3-69fb78938239",
    "type": "Notebook"
@@ -48,11 +43,6 @@
   {
    "displayName": "dq_check.py",
    "id": "43fd51a3-78cc-47d3-97b0-d989fb9e5fe9",
-   "type": "Notebook"
-  },
-  {
-   "displayName": "fake_data.py",
-   "id": "215c933b-9931-4079-8609-722661ba776e",
    "type": "Notebook"
   },
   {

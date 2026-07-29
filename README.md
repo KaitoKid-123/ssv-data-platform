@@ -153,19 +153,13 @@ ssv_data/                     # SHARED library -> built as a wheel, attached to 
   schema/   registry.py cast.py                           # StructTypes; fill-missing + cast-by-schema
   transforms/ common.py scd.py # pure df->df: pivot/range-join/coalesce + SCD2 (scd2_apply, as_of_join)
 
-sample_file/                  # PER-PIPELINE code — local copies of the Fabric notebooks (%run chain)
-  bronze.py.ipynb             # per-source ingest: Mongo (windowed) / PG (windowed+semi-join/full) / DLM
-  silver.py.ipynb gold.py.ipynb  # +7h day, explode items, SCD2 dims; ~80-col fact, as-of joins
-  pipeline.py.ipynb dq_check.py.ipynb nb_bi_refresh.py.ipynb simulators.py.ipynb ...
-  Pipeline_eod_sale_product/  # Fabric Data Pipeline definition (activities incl. nb_bi_refresh)
-  create_report_pbir.py       # PBIR report generator (API-built dashboard pages)
-
 fabric_items/                 # EXPORTED workspace definitions in git-integration layout —
                               #   both pipelines' notebooks/pipelines/TMDL/PBIR + manifest.json
                               #   + folders.json (workspace folder map) — backup, promotion & DR
 tools/                        # fabric_api.py (SPN/az auth + LRO) · deploy_wheel.py ·
                               #   export_definitions.py · deploy_definitions.py (restore/DR/promote,
-                              #   guid+ws-name remap, --folder domain scope) · verify_run.py
+                              #   guid+ws-name remap, --folder domain scope) · verify_run.py ·
+                              #   create_report_pbir.py (PBIR report generator)
 sample_service/               # DLM mock (FastAPI + Cloudflare Worker + Dockerfile)
 sample_stream/                # realtime producer: store_operation events -> Aiven Kafka
                               #   (Cloudflare Worker via Kafka REST + confluent-kafka twin)

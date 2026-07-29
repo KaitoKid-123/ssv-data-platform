@@ -18,13 +18,13 @@ metastore_db/
 derby.log
 
 # Generated seed artifacts (regenerate via simulators.write_all_artifacts)
-# NOTE: tests/ and sample_service/ are REAL SOURCE (pytest suite, DLM mock) — never ignore them.
+# NOTE: tests/, sample_service/, sample_stream/ and docs/ are REAL SOURCE — never ignore them.
 mongo_import/
 sample_source/
-sample_file/
-docs/adr/
-docs/superpowers/
 *.seed.sql
+
+# Runtime output from tools/check_runs.py (the monitor workflow) — never commit
+failures.txt
 
 # Local agent/session config
 .claude/
