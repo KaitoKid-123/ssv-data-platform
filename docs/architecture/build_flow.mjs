@@ -313,6 +313,46 @@ const x4 = d4.mxfile("eod_sale_service — Data Flow");
 writeFileSync(`${S}/flow_p4.drawio`, x4);
 console.log("written flow_p4.drawio (eod_sale_service)");
 
+// ---------------- Page 6: eod_sale_product realtime (speed layer, Lambda) ----------------
+const d5 = new Diagram("network");
+
+const rt_src = frame("rt_src", "Stream source", { dir: "col", gap: 20, stroke: SRC }, [
+  box("rt_w", "Cloudflare Worker\n(cron 1 min, synthetic\nstore_operation events)", { w: 210, h: 60 }),
+  box("rt_k", "Aiven Kafka\ntopic store_operation", { w: 210, h: 46, fill: "#dae8fc", stroke: SRC }),
+]);
+
+const rt_consumer = frame("rt_consumer", "Speed layer — Spark Structured Streaming", { dir: "col", gap: 10, stroke: PIP }, [
+  box("rt_c", "rlt_ingest_sale_product (scheduled 5 min)\nTrigger.AvailableNow micro-batch\nreadStream Kafka (SASL_SSL) -> parse envelope\n-> explode sale_normal_items -> decode -> +7h VN", { w: 300, h: 78 }),
+]);
+
+const rt_gold = frame("rt_gold", "GOLD — speed + serving", { dir: "col", gap: 10, stroke: GLD }, [
+  box("rt_rlt", "gold.rlt_fact_eod_sale_product\nDelta - MERGE dedup (txn+product+uom)\nTTL 72h - checkpoint = incremental", { w: 270, h: 60 }),
+  box("rt_batch", "gold.fact_eod_sale_product\n(batch fact - past days)", { w: 270, h: 40, fill: "#fff2cc", stroke: GLD }),
+  box("rt_view", "gold.vw_eod_sale_product_rlt\nUNION: batch (<= max date) + rlt (> max date)", { w: 270, h: 46, fill: "#f8cecc", stroke: RED }),
+  box("rt_mart", "gold.bi_eod_sale_product_rlt\n(7-day mart, rebuilt each run)", { w: 270, h: 40 }),
+]);
+
+const rt_bi = frame("rt_bi", "BI (realtime)", { dir: "col", gap: 10, stroke: BIC }, [
+  icon("rt_pbi", "power_bi", "Direct Lake 'Sales Product Realtime' + report (Auto Page Refresh 5 min)"),
+]);
+
+renderTree(d5, phantom("root5", "eod_sale_product — realtime speed layer (Lambda: batch + speed)", { dir: "row", gap: 46, align: "top" },
+  [rt_src, rt_consumer, rt_gold, rt_bi]), [40, 60]);
+
+d5.link("rt_w", "rt_k", "Kafka REST", { dash: true });
+d5.link("rt_k", "rt_c", "readStream");
+d5.link("rt_c", "rt_rlt", "MERGE");
+d5.link("rt_rlt", "rt_view", "");
+d5.link("rt_batch", "rt_view", "");
+d5.link("rt_view", "rt_mart", "");
+d5.link("rt_mart", "rt_pbi", "Direct Lake");
+
+const r5 = d5.validate();
+console.log("P5 VALIDATE:", JSON.stringify({ ok: r5.ok, errors: r5.errors, warnings: r5.warnings }));
+const x5 = d5.mxfile("Realtime — speed layer");
+writeFileSync(`${S}/flow_p5.drawio`, x5);
+console.log("written flow_p5.drawio (realtime)");
+
 // merge: later pages get an id namespace so ids stay unique across the file
 const dia = (x) => x.match(/<diagram[\s\S]*<\/diagram>/)[0];
 const ns = (x, p) => x.replace(/\b(id|source|target|parent)="([^"]*)"/g, (_, a, v) => `${a}="${p}${v}"`);
